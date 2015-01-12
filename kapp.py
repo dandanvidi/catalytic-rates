@@ -18,37 +18,6 @@ from python.kegg_model import KeggModel
 from python.component_contribution import ComponentContribution
 from python.thermodynamic_constants import R, default_T
 
-#growth_rates = {'ac':0.29, 'fum':0.47, 'gal':0.17, 'glc':0.60, 'gam':0.39, 'glyc':0.47, 'pyr':0.4, 'succ':0.4, 
-#                  'anaerobic':0.55, 'Chem_05':0.5, 'Chem_035':0.35, 'Chem_02':0.2, 'Chem_012':0.12,
-#                  '42Cdeg':0.65, 'pH6':0.5, 'NaCl_50mM':0.65, 
-#                  'vilu_011':0.11, 'vilu_021':0.21, 'vilu_031':0.31, 'vilu_04':0.40, 'vilu_049':0.49}
-#
-#cond_to_cell_vol = {'ac':2.4e-15, 'fum':2.4e-15, 'gal':1.9e-15, 'glc':3.2e-15, 'gam':2.9e-15, 'glyc':2.3e-15, 
-#	               'pyr':2.1e-15, 'succ':2.4e-15, 'anaerobic':2.9e-15, 'Chem_05':2.6e-15, 'Chem_035':2.4e-15, 
-#                    'Chem_02':2.2e-15, 'Chem_012':2.1e-15, '42Cdeg':2.8e-15, 'pH6':3.1e-15, 'NaCl_50mM':2.8e-15,
-#                    'vilu_011':0.73e-15, 'vilu_021':0.91e-15, 'vilu_031':1.22e-15, 'vilu_04':1.46e-15, 'vilu_049':1.69e-15} # in liter
-#
-## sort conditions by growth rate
-#growth_conditions = sorted(growth_rates.keys(), key=growth_rates.get)    
-## imported files
-#
-#metabolites_concentration = pd.read_csv(metabolites_conc) 
-#metabolites_concentration.set_index('Compound Id (KEGG)', inplace=True)
-#metabolites_concentration.dropna(how='all', inplace=True)
-#known_cids = {'C'+'%05i'%c:c for c in metabolites_concentration.index}                
-#    
-#model_fname = "data/iJO1366_curated.xml"
-#ecoli_genes = "data/all_ecoli_genes.txt"
-#heinmann_proteomics = "data/Heinmann_proteomics.csv"
-#vilu_proteomics = "data/Vilu_proteomics.csv"
-#brenda = "data/brenda_data.csv"
-#kcat_fname = "data/kcat_dictionary.csv"        
-#metabolites_conc = "data/metab_conc.csv"
-#    genes = [row[0:5] for row in open(ecoli_genes, 'r')]
-#    gene_names = {row[0:5]:row[84:].split(';')[0].strip() for row in open(ecoli_genes, 'r')}
-
-CC_CACHE_FNAME = os.path.expanduser('~/git/component-contribution/cache/component_contribution.mat')
-
 class MODEL(object):
     
     def __init__(self, model):
@@ -153,10 +122,52 @@ class RCAT(MODEL):
     
     def __init__(self, model):
         MODEL.__init__(self, model)
+
         self.E_data = pd.read_csv("cache/enzyme_conc_across_conditions.csv")
+        self.E_data.set_index('reactions', inplace=True)
+
         self.V_data = pd.read_csv("cache/pFBA_dist_across_conditions.csv")
+        self.V_data.set_index('reactions', inplace=True)
+
+    def calculate_enzyme_rates(self):
         
-    def add_condition(self, growth_params):
+        # find intercept of measured conditions
+        if len(self.E_data.columns) != len(self.V_data.columns):
+            print "the number of conditions is not identical \
+                  in flux and proteomics, thus the intersect is used"
+
+        conditions = self.E_data.columns & self.V_data.columns
+        
+        # calculate rats by dividing flux by proteomics
+        rates = self.V_data[conditions] / self.E_data[conditions]
+
+        # replace zero and inf values with nan
+        rates.replace([0, np.inf, -np.inf], np.nan, inplace=True)
+
+        return rates
+
+    def get_rcat_max(self, minimal_conditions):
+        
+        rcat = self.calculate_enzyme_rates()      
+        rcat.dropna(thresh=minimal_conditions, inplace=True)
+        return rcat.max(axis=1)       
+            
+        
+    def get_best_condition(self, minimal_conditions):
+        
+        rcat = self.calculate_enzyme_rates        
+        rcat.dropna(thresh=minimal_conditions, inplace=True)
+        return rcat.idxmax(axis=1)       
+        
+    def get_kcat_of_model_reactions(self):
+        
+        # kcat values collected from BRENDA and other publications - manually curated
+        kcats = pd.read_csv("data/manual_kcat_values.csv")
+        kcats.set_index('reactions', inplace=True)
+
+        return kcats['kcat [1/s]']        
+        
+    def add_condition(self, proteomics_fname, growth_params):
         '''
             growth params  - a dictionary of growth condition paramters
                 title - name of condition
@@ -165,13 +176,36 @@ class RCAT(MODEL):
                 oxygen - float of oxygen uptake rate [mmol/gCDW/h]
         '''
         
+        new_abundance = self._get_enzyme_abundance(proteomics_fname)
+        out_abundance = self.E_data.join(new_abundance, how='left')
+        out_abundance.to_csv("cache/enzyme_conc_across_conditions.csv")
+        
         new_flux = self._calculate_pFBA(growth_params)
         out_flux = self.V_data.join(new_flux, how='left')
         out_flux.to_csv("cache/pFBA_distribution_across_conditions.csv")
-        
-        new_abundance = self._get_enzyme_abundance(growth_params['title'])
-        self.E_data.join(new_abundance, how='left')
 
+    def _get_enzyme_abundance(self, proteomics_fname):
+        '''
+            map proteomics data to the cobra model reactions
+            by bnumbers (gene identifiers in E. coli)
+            
+            Argumetns:
+                csv file with proteomics data
+                units are: copies of enzmye / gCDW
+            
+            Returns:
+                pandas series with reactions as index and
+                enzyme abundance as values
+        '''
+
+        reactions_to_bnumbers = self.map_model_reaction_to_genes().set_index(1)
+        new_data = pd.read_csv(proteomics_fname).set_index('bnumber')
+        
+        abundance = reactions_to_bnumbers.join(new_data, how='left')
+        abundance.set_index(0, inplace=True)
+        abundance.dropna(inplace=True)
+        
+        return abundance
 
     def _calculate_pFBA(self, growth_params):
         
@@ -193,10 +227,13 @@ class RCAT(MODEL):
         optimize_minimal_flux(self.model, already_irreversible=True)
         print "\t GR: %.02f 1/h" %self.model.solution.f
         
-        flux_dist = pd.Series(self.model.solution.x_dict.items())
+        flux_dist = pd.DataFrame(self.model.solution.x_dict.items()).set_index(0)
+        
+        #convert units from mmol/gCDW/h to molecules/gCDW/s
+        flux_dist = flux_dist * 6.02214129e23 / 1000 / 3600 
 
         return flux_dist    
-        
+                
     def _calculate_pFVA(self, growth_params):
         '''
             calculates the uncertainties of flux by running FVA 
@@ -253,6 +290,14 @@ class RCAT(MODEL):
 
         return flux_ranges
 
+    def manually_remove_reactions(self, reactions):
+        # PPKr_reverse reaction is used for ATP generation from ADP 
+        # in the FBA model. Nevertheless, acording to EcoCyc, it is used to 
+        # to generate polyP (inorganic phosphate) chains from ATP and it is not
+        # part of the oxidative phosphorilation
+        list_of_reactions = ['PPKr_reverse']
+        return reactions.drop(list_of_reactions) 
+        
 if __name__ == "__main__":
 
     model_fname = "data/iJO1366_curated.xml"
@@ -260,7 +305,31 @@ if __name__ == "__main__":
     rate = RCAT(model)
     growth_params = {'title':'glucose_heinamnn', 'carbon':'glc',
                      'growth_rate':0.6, 'oxygen':-1000}
-    pfva_ranges = rate._calculate_pFVA(growth_params)
+
+    kcat = rate.get_kcat_of_model_reactions()
+    rcat_max = rate.get_rcat_max(5)
+    
+    r = kcat.index & rcat_max.index
+    
+    r = rate.manually_remove_reactions(r)
+
+
+    
+    from scipy import stats
+    import matplotlib.pyplot as plt
+    cor, pval = stats.pearsonr(np.log10(kcat[r]), np.log10(rcat_max[r])) 
+    print cor**2
+
+    res =  np.log10(kcat[r]) - np.log10(rcat_max[r])
+    res.sort()
+    
+    fig = plt.figure(figsize=(5,5))
+    plt.plot(kcat[r], rcat_max[r], 'ro')
+    plt.xscale('log')    
+    plt.yscale('log')    
+    plt.xlim(1e-4, 1e4)
+    plt.ylim(1e-4, 1e4)    
+    #pfva_ranges = rate._calculate_pFVA(growth_params)
     
 
 #    def reactions_proteomics(self):
@@ -278,8 +347,7 @@ if __name__ == "__main__":
 #        hein = hein[hein>1] # filter enzymes genes with very low expression
 #        
 #        # convert heinmann units from copies/cell to copies/gCDW
-#        for c in self.heinmann:
-#            hein[c] = hein[c] / (self.cond_to_cell_vol[c]/2) / (0.3 * 1e3) # copies/gCDW
+
 #
 #        ab = vilu.join(hein, how='outer') # merge data sets
 #        
@@ -362,36 +430,9 @@ if __name__ == "__main__":
 #        abundances = pd.read_csv('cache/reactions_to_enzyme_concentrations_across_conditions.csv').set_index('0')
 #        return abundances
 #        
-#    def enzyme_rates(self):
-#        
-#        # get flux and enzyme lelvels across all conditions        
-#        flux = self.reactions_fluxes()
-#        proteomics = self.reactions_abundances()
+
 #
-#        # find intercept of measured conditions
-#        conditions = flux.columns & proteomics.columns
-#
-#        # calculate rats by dividing flux by proteomics
-#        rates = flux[conditions] / proteomics[conditions]
-#
-#        # remove nan rows 
-#        rates.replace([0, np.inf, -np.inf], np.nan, inplace=True)
-#        rates.dropna(thresh=self.minimal_conditions, inplace=True)        
-#
-#        return rates
-#
-#    def reactions_to_kcat(self):
-#        
-#        # kcat values collected from BRENDA and other publications - manually curated
-#        fi = csv.DictReader(open(kcat_fname))
-#        r_to_kcat = {}
-#
-#        for row in fi:
-#            if row['Kcat(1/s)'] != 'NaN':
-#                r = row['reaction name'].strip()
-#                r_to_kcat[r] = float(row['Kcat(1/s)'])
-#
-#        return pd.Series(r_to_kcat, index=r_to_kcat.keys())
+
 #        
 #    def BRENDA_kcat(self):
 #
@@ -634,6 +675,36 @@ if __name__ == "__main__":
 #    ax.set_xscale('log')
 #    ax.set_yscale('log')
     
-    
+ 
+#growth_rates = {'ac':0.29, 'fum':0.47, 'gal':0.17, 'glc':0.60, 'gam':0.39, 'glyc':0.47, 'pyr':0.4, 'succ':0.4, 
+#                  'anaerobic':0.55, 'Chem_05':0.5, 'Chem_035':0.35, 'Chem_02':0.2, 'Chem_012':0.12,
+#                  '42Cdeg':0.65, 'pH6':0.5, 'NaCl_50mM':0.65, 
+#                  'vilu_011':0.11, 'vilu_021':0.21, 'vilu_031':0.31, 'vilu_04':0.40, 'vilu_049':0.49}
+#
+#cond_to_cell_vol = {'ac':2.4e-15, 'fum':2.4e-15, 'gal':1.9e-15, 'glc':3.2e-15, 'gam':2.9e-15, 'glyc':2.3e-15, 
+#	               'pyr':2.1e-15, 'succ':2.4e-15, 'anaerobic':2.9e-15, 'Chem_05':2.6e-15, 'Chem_035':2.4e-15, 
+#                    'Chem_02':2.2e-15, 'Chem_012':2.1e-15, '42Cdeg':2.8e-15, 'pH6':3.1e-15, 'NaCl_50mM':2.8e-15,
+#                    'vilu_011':0.73e-15, 'vilu_021':0.91e-15, 'vilu_031':1.22e-15, 'vilu_04':1.46e-15, 'vilu_049':1.69e-15} # in liter
+#
+## sort conditions by growth rate
+#growth_conditions = sorted(growth_rates.keys(), key=growth_rates.get)    
+## imported files
+#
+#metabolites_concentration = pd.read_csv(metabolites_conc) 
+#metabolites_concentration.set_index('Compound Id (KEGG)', inplace=True)
+#metabolites_concentration.dropna(how='all', inplace=True)
+#known_cids = {'C'+'%05i'%c:c for c in metabolites_concentration.index}                
+#    
+#model_fname = "data/iJO1366_curated.xml"
+#ecoli_genes = "data/all_ecoli_genes.txt"
+#heinmann_proteomics = "data/Heinmann_proteomics.csv"
+#vilu_proteomics = "data/Vilu_proteomics.csv"
+#brenda = "data/brenda_data.csv"
+#metabolites_conc = "data/metab_conc.csv"
+#    genes = [row[0:5] for row in open(ecoli_genes, 'r')]
+#    gene_names = {row[0:5]:row[84:].split(';')[0].strip() for row in open(ecoli_genes, 'r')}
+
+#CC_CACHE_FNAME = os.path.expanduser('~/git/component-contribution/cache/component_contribution.mat')
+   
     
     
