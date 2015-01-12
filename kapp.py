@@ -161,25 +161,25 @@ class RCAT(MODEL):
             growth params  - a dictionary of growth condition paramters
                 title - name of condition
                 carbon - str of carbon source in a cobra style (e.g glucose -> glc)
-                uptake - carbon uptake rate mmol/gCDW/h
-                oxy - float of oxygen uptake rate mmol/gCDW/h
+                growth_rate - float of growht rate [1/h]
+                oxygen - float of oxygen uptake rate [mmol/gCDW/h]
         '''
         
-        new_flux = self.pFBA(growth_params)
+        new_flux = self._calculate_pFBA(growth_params)
         out_flux = self.V_data.join(new_flux, how='left')
         out_flux.to_csv("cache/pFBA_distribution_across_conditions.csv")
         
-        new_abundance = self.enzyme_abundance(growth_params['title'])
+        new_abundance = self._get_enzyme_abundance(growth_params['title'])
         self.E_data.join(new_abundance, how='left')
 
 
-    def pFBA(self, growth_params):
+    def _calculate_pFBA(self, growth_params):
         
         convert_to_irreversible(self.model)            
 
         cond = growth_params['carbon']
-        uptake = growth_params['uptake']
-        oxy = growth_params['oxy']
+        uptake = growth_params['growth_rate']
+        oxy = growth_params['oxygen']
                 
         rxns = dict([(r.id, r) for r in self.model.reactions])
         rxns['EX_glc_e'].lower_bound = 0 # uptake of carbon source reaction is initialized    
@@ -189,7 +189,7 @@ class RCAT(MODEL):
             rxns['EX_glc_e'].lower_bound = -1000
         rxns['Ec_biomass_iJO1366_core_53p95M'].upper_bound = uptake            
         rxns['EX_o2_e'].lower_bound = oxy
-        print "solving model for %s..." %cond,
+        print "solving model for %s..." %growth_params['title'],
         optimize_minimal_flux(self.model, already_irreversible=True)
         print "\t GR: %.02f 1/h" %self.model.solution.f
         
@@ -197,12 +197,70 @@ class RCAT(MODEL):
 
         return flux_dist    
         
+    def _calculate_pFVA(self, growth_params):
+        '''
+            calculates the uncertainties of flux by running FVA 
+            given minimization of the total sum of fluxes
+            
+            Arguments:
+                growth_params - 
+                
+            Returns:
+                flux_ranges - the range of each flux
+        '''
+        
+        cond = growth_params['carbon']
+        uptake = growth_params['growth_rate']
+        oxy = growth_params['oxygen']
+        
+        convert_to_irreversible(self.model)
+
+        rxns = dict([(r.id, r) for r in self.model.reactions])
+
+        rxns['EX_glc_e'].lower_bound = 0 # uptake of carbon source reaction is initialized    
+        rxns['EX_' + cond + '_e'].lower_bound = -1000 # redefine sole carbon source uptake reaction in mmol/gr/h
+
+        rxns['EX_o2_e'].lower_bound = oxy
+
+        rxns['Ec_biomass_iJO1366_core_53p95M'].upper_bound = uptake            
+        rxns['Ec_biomass_iJO1366_core_53p95M'].lower_bound = uptake            
+
+        
+        fake = Metabolite(id='fake')
+        model.add_metabolites(fake)        
+                
+        for r in self.model.reactions:
+            r.add_metabolites({fake:1})
+            
+        flux_counter = Reaction(name='flux_counter')
+        flux_counter.add_metabolites(metabolites={fake:-1})                
+
+        model.add_reaction(flux_counter) 
+        self.model.change_objective(flux_counter)
+        
+        print "solving pFVA"
+        fva = flux_variability_analysis(self.model, 
+                                        reaction_list=self.model.reactions, 
+                                        objective_sense='minimize',
+                                        fraction_of_optimum=1.1)
+            
+        flux_ranges = pd.Series(index=map(lambda x: x.id, self.model.reactions))
+
+        for r, v in fva.iteritems():
+            flux_ranges[r] = v['maximum'] - v['minimum']
+
+#        flux_ranges.to_csv("cache/reactions_to_pfva_ranges")
+
+        return flux_ranges
+
 if __name__ == "__main__":
 
     model_fname = "data/iJO1366_curated.xml"
     model = create_cobra_model_from_sbml_file(model_fname)
     rate = RCAT(model)
-    v = rate.V_data
+    growth_params = {'title':'glucose_heinamnn', 'carbon':'glc',
+                     'growth_rate':0.6, 'oxygen':-1000}
+    pfva_ranges = rate._calculate_pFVA(growth_params)
     
 
 #    def reactions_proteomics(self):
@@ -245,66 +303,8 @@ if __name__ == "__main__":
 #            # load cobra model
 #            model = create_cobra_model_from_sbml_file(model_fname)
 ##        
-#    def pFVA(self):
-# 
-#        model = create_cobra_model_from_sbml_file(model_fname)
-#        reactions = [r.id for r in model.reactions]
-#        flux_ranges = pd.DataFrame(columns = self.growth_conditions, index=reactions)
-#
-#        for cond in self.growth_conditions[0:1]:
-#
-#            model = create_cobra_model_from_sbml_file(model_fname)
-#            convert_to_irreversible(model)
-#
-#            # add constrains
-#            oxygen_uptake=-1000
-#            if cond == 'anaerobic':
-#                oxygen_uptake = -0.001            
-#
-#            growth_rate = self.growth_rates[cond]    
-#            rxns = dict([(r.id, r) for r in model.reactions])
-#            rxns['EX_glc_e'].lower_bound = 0 # uptake of carbon source reaction is initialized    
-#            try:
-#                rxns['EX_' + cond + '_e'].lower_bound = -1000 # redefine sole carbon source uptake reaction in mmol/gr/h
-#            except:
-#                rxns['EX_glc_e'].lower_bound = -1000
-#            rxns['Ec_biomass_iJO1366_core_53p95M'].upper_bound = growth_rate            
-#            rxns['EX_o2_e'].lower_bound = oxygen_uptake
-#            print "solving model for %s..." %cond
-#
-#            model.optimize()
-#
-#            for reaction in model.reactions:
-#                # if the reaction has a nonzero objective coefficient, then
-#                # the same flux should be maintained through that reaction
-#                if reaction.objective_coefficient != 0:
-#
-#                    x = model.solution.x_dict[reaction.id]
-#                    reaction.lower_bound = x
-#                    reaction.upper_bound = x
-#                    reaction.objective_coefficient = 0
-#    
-#            fake = Metabolite(id='fake')
-#            model.add_metabolites(fake)        
-#    
-#            for r in model.reactions:
-#                r.add_metabolites({fake:1})
-#                
-#            flux_counter = Reaction(name='flux_counter')
-#            flux_counter.add_metabolites(metabolites={fake:-1})
-#            flux_counter.objective_coefficient = 1
-#            
-#            model.add_reaction(flux_counter)
-#            #self.model.optimize(objective_sense='minimize')
-#            fva = flux_variability_analysis(model, reaction_list=model.reactions, objective_sense='minimize')
-#            
-#            for r, v in fva.iteritems():
-#                flux_ranges[cond][r] = v['maximum'] - v['minimum']
-#
-#        flux_ranges.to_csv("cache/reactions_to_pfva_ranges")
-#
-#        return flux_ranges
-#
+
+#_get_pFBA
 #    def reactions_dG(self,c = 1e-3, pH=7.5, I=0.2, T=298.15):
 #    
 #        if not os.path.exists(CC_CACHE_FNAME):
