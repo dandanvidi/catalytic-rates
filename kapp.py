@@ -152,6 +152,17 @@ class RCAT(MODEL):
         rcat.dropna(thresh=minimal_conditions, inplace=True)
         return rcat.max(axis=1)       
             
+    def get_rcat_second_max(self, minimal_conditions):
+        
+        rcat = self.calculate_enzyme_rates()
+        rcat.dropna(thresh=minimal_conditions, inplace=True)
+
+        max1 = zip(rcat.index, rcat.idxmax(axis=1))
+        
+        for r, cond in max1:
+            rcat[cond][r] = 0
+        return rcat.max(axis=1)        
+
         
     def get_best_condition(self, minimal_conditions):
         
@@ -165,7 +176,7 @@ class RCAT(MODEL):
         kcats = pd.read_csv("data/manual_kcat_values.csv")
         kcats.set_index('reactions', inplace=True)
 
-        return kcats['kcat [1/s]']        
+        return kcats['kcat per subunit']        
         
     def add_condition(self, proteomics_fname, growth_params):
         '''
@@ -300,6 +311,7 @@ class RCAT(MODEL):
         
 if __name__ == "__main__":
 
+    minimal_conditions = 5
     model_fname = "data/iJO1366_curated.xml"
     model = create_cobra_model_from_sbml_file(model_fname)
     rate = RCAT(model)
@@ -307,8 +319,8 @@ if __name__ == "__main__":
                      'growth_rate':0.6, 'oxygen':-1000}
 
     kcat = rate.get_kcat_of_model_reactions()
-    rcat_max = rate.get_rcat_max(5)
-    
+    rcat_max = rate.get_rcat_max(minimal_conditions)
+    rcat_second_max = rate.get_rcat_second_max(minimal_conditions-1)
     r = kcat.index & rcat_max.index
     
     r = rate.manually_remove_reactions(r)
@@ -318,17 +330,22 @@ if __name__ == "__main__":
     from scipy import stats
     import matplotlib.pyplot as plt
     cor, pval = stats.pearsonr(np.log10(kcat[r]), np.log10(rcat_max[r])) 
+    print cor**2, 
+    cor, pval = stats.pearsonr(np.log10(kcat[r]), np.log10(rcat_second_max[r])) 
     print cor**2
-
+    
     res =  np.log10(kcat[r]) - np.log10(rcat_max[r])
     res.sort()
     
     fig = plt.figure(figsize=(5,5))
-    plt.plot(kcat[r], rcat_max[r], 'ro')
+    plt.scatter(kcat[r], rcat_max[r], color='r')
+    plt.scatter(kcat[r], rcat_second_max[r], color='0.5')
     plt.xscale('log')    
     plt.yscale('log')    
     plt.xlim(1e-4, 1e4)
     plt.ylim(1e-4, 1e4)    
+
+
     #pfva_ranges = rate._calculate_pFVA(growth_params)
     
 
