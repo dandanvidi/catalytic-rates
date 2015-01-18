@@ -17,6 +17,7 @@ from python.kegg_reaction import KeggReaction
 from python.kegg_model import KeggModel
 from python.component_contribution import ComponentContribution
 from python.thermodynamic_constants import R, default_T
+from copy import deepcopy
 
 class MODEL(object):
     
@@ -25,7 +26,9 @@ class MODEL(object):
         model - a cobra object
         model_fname - str of path to model xml file
         """
-        self.model = model
+        self.model = deepcopy(model)
+        self.gene_names = {row[0:5]:row[84:].split(';')[0].strip() 
+                            for row in open("data/all_ecoli_genes.txt", 'r')}
         
     def model_metabolites(self):
         
@@ -123,77 +126,17 @@ class RCAT(MODEL):
     def __init__(self, model):
         MODEL.__init__(self, model)
 
+        self.minimal_conditions = 5
         self.E_data = pd.read_csv("cache/enzyme_conc_across_conditions.csv")
         self.E_data.set_index('reactions', inplace=True)
 
         self.V_data = pd.read_csv("cache/pFBA_dist_across_conditions.csv")
         self.V_data.set_index('reactions', inplace=True)
 
-    def calculate_enzyme_rates(self):
-        
-        # find intercept of measured conditions
-        if len(self.E_data.columns) != len(self.V_data.columns):
-            print "the number of conditions is not identical \
-                  in flux and proteomics, thus the intersect is used"
-
-        conditions = self.E_data.columns & self.V_data.columns
-        
-        # calculate rats by dividing flux by proteomics
-        rates = self.V_data[conditions] / self.E_data[conditions]
-
-        # replace zero and inf values with nan
-        rates.replace([0, np.inf, -np.inf], np.nan, inplace=True)
-
-        return rates
-
-    def get_rcat_max(self, minimal_conditions):
-        
-        rcat = self.calculate_enzyme_rates()      
-        rcat.dropna(thresh=minimal_conditions, inplace=True)
-        return rcat.max(axis=1)       
-            
-    def get_rcat_second_max(self, minimal_conditions):
-        
-        rcat = self.calculate_enzyme_rates()
-        rcat.dropna(thresh=minimal_conditions, inplace=True)
-
-        max1 = zip(rcat.index, rcat.idxmax(axis=1))
-        
-        for r, cond in max1:
-            rcat[cond][r] = 0
-        return rcat.max(axis=1)        
-
-        
-    def get_best_condition(self, minimal_conditions):
-        
-        rcat = self.calculate_enzyme_rates        
-        rcat.dropna(thresh=minimal_conditions, inplace=True)
-        return rcat.idxmax(axis=1)       
-        
-    def get_kcat_of_model_reactions(self):
-        
-        # kcat values collected from BRENDA and other publications - manually curated
-        kcats = pd.read_csv("data/manual_kcat_values.csv")
-        kcats.set_index('reactions', inplace=True)
-
-        return kcats['kcat per subunit']        
-        
-    def add_condition(self, proteomics_fname, growth_params):
-        '''
-            growth params  - a dictionary of growth condition paramters
-                title - name of condition
-                carbon - str of carbon source in a cobra style (e.g glucose -> glc)
-                growth_rate - float of growht rate [1/h]
-                oxygen - float of oxygen uptake rate [mmol/gCDW/h]
-        '''
-        
-        new_abundance = self._get_enzyme_abundance(proteomics_fname)
-        out_abundance = self.E_data.join(new_abundance, how='left')
-        out_abundance.to_csv("cache/enzyme_conc_across_conditions.csv")
-        
-        new_flux = self._calculate_pFBA(growth_params)
-        out_flux = self.V_data.join(new_flux, how='left')
-        out_flux.to_csv("cache/pFBA_distribution_across_conditions.csv")
+        self.pFVA_ranges = pd.read_csv("cache/reactions_to_pfva_ranges.csv")
+        self.pFVA_ranges.set_index('reactions', inplace=True) 
+        self.pFVA_ranges = self.pFVA_ranges * 6.02214129e23 / 1000 / 3600 
+        self.rcat_err = (self.pFVA_ranges / self.V_data)
 
     def _get_enzyme_abundance(self, proteomics_fname):
         '''
@@ -244,8 +187,99 @@ class RCAT(MODEL):
         flux_dist = flux_dist * 6.02214129e23 / 1000 / 3600 
 
         return flux_dist    
+        
+    def calculate_enzyme_rates(self):
+        
+        # find intercept of measured conditions
+        if len(self.E_data.columns) != len(self.V_data.columns):
+            print "the number of conditions is not identical \
+                  in flux and proteomics, thus the intersect is used"
+
+        conditions = self.E_data.columns & self.V_data.columns
+        
+        # calculate rats by dividing flux by proteomics
+        rcat = self.V_data[conditions] / self.E_data[conditions]
+
+        # replace zero and inf values with nan
+        rcat.replace([0, np.inf, -np.inf], np.nan, inplace=True)
+
+        return rcat
+
+    def get_sorted_rates(self):
+        
+        rcat = self.calculate_enzyme_rates()
+        rcat.dropna(thresh=self.minimal_conditions, inplace=True)
+        rcat.replace(np.nan, -1, inplace=True)
+
+        rcat = rcat.T
+        sorted_rates = {}
+        for r in rcat:
+            n = rcat[r].values
+            sorted_rates[r] = sorted(n, reverse=True)
+
+        return sorted_rates
+
+    def get_rcat_max_range(self):
+
+        rates = self.get_sorted_rates()
+        mrange = {k:[v[2], v[0]] for k,v in rates.iteritems()}
+        max_range = pd.DataFrame(mrange, index=['low_delta', 'high_delta'])
+        return max_range.T
+        
+    def get_rcat_max(self):
+        
+        rates = self.get_sorted_rates()
+        max_rates = {k:v[0] for k,v in rates.iteritems()}
+        max_rate = pd.Series(max_rates)
+        return max_rate
+            
+    def get_rcat_second_max(self):
+        
+        rates = self.get_sorted_rates()
+        max_rates = {k:v[1] for k,v in rates.iteritems()}
+        second_max = pd.Series(max_rates)
+        return second_max
+
+    def get_rcat_mean_max(self):
+        
+        rates = self.get_sorted_rates()
+        max_rates = {k:v[v>0] for k,v in rates.iteritems()}
+        max_rates = {k:np.mean(v[0:3]) for k,v in rates.iteritems()}
+        mean_max = pd.Series(max_rates)
+        return mean_max
+        
+    def get_best_condition(self):
+        
+        rcat = self.calculate_enzyme_rates()       
+        rcat.dropna(thresh=self.minimal_conditions, inplace=True)
+        return rcat.idxmax(axis=1)       
+        
+    def get_kcat_of_model_reactions(self):
+        
+        # kcat values collected from BRENDA and other publications - manually curated
+        kcats = pd.read_csv("data/manual_kcat_values.csv")
+        kcats.set_index('reactions', inplace=True)
+
+        return kcats['kcat per subunit']        
+        
+    def add_condition(self, proteomics_fname, growth_params):
+        '''
+            growth params  - a dictionary of growth condition paramters
+                title - name of condition
+                carbon - str of carbon source in a cobra style (e.g glucose -> glc)
+                growth_rate - float of growht rate [1/h]
+                oxygen - float of oxygen uptake rate [mmol/gCDW/h]
+        '''
+        
+        new_abundance = self._get_enzyme_abundance(proteomics_fname)
+        out_abundance = self.E_data.join(new_abundance, how='outer')
+        out_abundance.to_csv("cache/enzyme_conc_across_conditions.csv")
+        
+        new_flux = self._calculate_pFBA(growth_params)
+        out_flux = self.V_data.join(new_flux, how='outer')
+        out_flux.to_csv("cache/pFBA_distribution_across_conditions.csv")
                 
-    def _calculate_pFVA(self, growth_params):
+    def calculate_pFVA(self, growth_params):
         '''
             calculates the uncertainties of flux by running FVA 
             given minimization of the total sum of fluxes
@@ -275,7 +309,7 @@ class RCAT(MODEL):
 
         
         fake = Metabolite(id='fake')
-        model.add_metabolites(fake)        
+        self.model.add_metabolites(fake)        
                 
         for r in self.model.reactions:
             r.add_metabolites({fake:1})
@@ -283,7 +317,7 @@ class RCAT(MODEL):
         flux_counter = Reaction(name='flux_counter')
         flux_counter.add_metabolites(metabolites={fake:-1})                
 
-        model.add_reaction(flux_counter) 
+        self.model.add_reaction(flux_counter) 
         self.model.change_objective(flux_counter)
         
         print "solving pFVA"
@@ -291,15 +325,21 @@ class RCAT(MODEL):
                                         reaction_list=self.model.reactions, 
                                         objective_sense='minimize',
                                         fraction_of_optimum=1.1)
-            
-        flux_ranges = pd.Series(index=map(lambda x: x.id, self.model.reactions))
+#        index=map(lambda x: x.id, self.model.reactions), 
+        flux_ranges = pd.Series(name=growth_params['title'])
 
         for r, v in fva.iteritems():
             flux_ranges[r] = v['maximum'] - v['minimum']
 
-#        flux_ranges.to_csv("cache/reactions_to_pfva_ranges")
+        flux_ranges.index.name = 'reactions'
+        flux_ranges.reset_index
+        out_ranges = self.pFVA_ranges.join(flux_ranges, how='outer')
+        out_ranges.to_csv("cache/reactions_to_pfva_ranges.csv", header=True)
 
         return flux_ranges
+
+    def get_rcat_max_err(self):
+        return self.rcat_err.median(axis=1)    
 
     def manually_remove_reactions(self, reactions):
         # PPKr_reverse reaction is used for ATP generation from ADP 
@@ -309,41 +349,92 @@ class RCAT(MODEL):
         list_of_reactions = ['PPKr_reverse']
         return reactions.drop(list_of_reactions) 
         
+    def calculate_rcat_err(self):
+        s = self.get_sorted_rates()
+        s = {k:np.std(v[0:2]) for k, v in s.iteritems()}
+        s = pd.DataFrame(s, index=['std'])
+        s.index.name = 'reactions'
+        return s.T
 if __name__ == "__main__":
 
-    minimal_conditions = 5
     model_fname = "data/iJO1366_curated.xml"
     model = create_cobra_model_from_sbml_file(model_fname)
     rate = RCAT(model)
-    growth_params = {'title':'glucose_heinamnn', 'carbon':'glc',
-                     'growth_rate':0.6, 'oxygen':-1000}
+
+    growth_conditions = csv.DictReader(open("data/growth_conditions.csv", 'r'))
+
 
     kcat = rate.get_kcat_of_model_reactions()
-    rcat_max = rate.get_rcat_max(minimal_conditions)
-    rcat_second_max = rate.get_rcat_second_max(minimal_conditions-1)
-    r = kcat.index & rcat_max.index
+    rcat = rate.calculate_enzyme_rates()    
+    rcat_max = rate.get_rcat_second_max()
+    rcat_median = rcat.median(axis=1)    
+    yerr = rate.get_rcat_max()
     
+    r = kcat.index & rcat_max.index
     r = rate.manually_remove_reactions(r)
 
-
-    
-    from scipy import stats
     import matplotlib.pyplot as plt
-    cor, pval = stats.pearsonr(np.log10(kcat[r]), np.log10(rcat_max[r])) 
-    print cor**2, 
-    cor, pval = stats.pearsonr(np.log10(kcat[r]), np.log10(rcat_second_max[r])) 
-    print cor**2
+    fig = plt.figure(figsize=(8,8))
+    ax = plt.axes()
+
+
+#    
+#    ax.scatter(kcat[r], rcat_max[r], color='r')    
+
+#    ax.set_xscale('log')    
+#    ax.set_yscale('log')    
+#    plt.draw()    
+#    plt.xlim(1e-4, 1e4)
+#    plt.ylim(1e-4, 1e4)    
+#
+    from plot_data import plot
+    plot(kcat[r], rcat_max[r], fig, ax, 
+         color='#FFB84D', edge='none', 
+         labels=r, limits = np.array([1e-4,1e4]))
+
+    t = r
+    for t in r:
+        d = [[rcat_max[t]-rcat_median[t]], [yerr[t]]]
+        len_d = np.abs(np.log10(d[1][0]/d[0][0]))
+        if len_d >= 0:
+            
+            ax.errorbar(kcat[t], rcat_max[t], 
+                        yerr=d,
+                        uplims=False,
+                        lolims=False,
+                        barsabove=True,
+                        fmt=None, 
+                        ecolor='b')
     
-    res =  np.log10(kcat[r]) - np.log10(rcat_max[r])
-    res.sort()
-    
-    fig = plt.figure(figsize=(5,5))
-    plt.scatter(kcat[r], rcat_max[r], color='r')
-    plt.scatter(kcat[r], rcat_second_max[r], color='0.5')
-    plt.xscale('log')    
-    plt.yscale('log')    
-    plt.xlim(1e-4, 1e4)
-    plt.ylim(1e-4, 1e4)    
+    ax.set_ylabel(r'in vivo $r^{max}_{cat}$ $\left[s^{-1}\right]$', size=20)
+    ax.set_xlabel(r'in vitro $k_{cat}$ $\left[s^{-1}\right]$', size=20)
+
+    a = plt.axes([0.2, 0.7, .21, .21])
+    plt.hist(np.log10((yerr[r]-rcat.loc[r].median(axis=1))/rcat_max[r]))
+    a.set_xticks(np.arange(-1,1.1,0.5))
+    plt.tight_layout()
+    plt.show()
+    fig.savefig('res/kcat_rcatmax_correlation_std_by_ron.svg')
+
+#    from scipy import stats
+
+#    cor, pval = stats.pearsonr(np.log10(kcat[r]), np.log10(rcat_max[r])) 
+#    print cor**2, 
+#    cor, pval = stats.pearsonr(np.log10(kcat[r]), np.log10(rcat_second_max[r])) 
+#    print cor**2    
+#    cor, pval = stats.pearsonr(np.log10(kcat[r]), np.log10(rcat_median_max[r])) 
+#    print cor**2
+#
+#    res =  np.log10(kcat[r]) - np.log10(rcat_max[r])
+#    res.sort()
+#    
+
+
+
+
+#    plt.scatter(kcat[r], rcat_second_max[r], color='0.5')
+#    plt.scatter(kcat[r], rcat_median_max[r], color='c')
+
 
 
     #pfva_ranges = rate._calculate_pFVA(growth_params)
@@ -693,15 +784,6 @@ if __name__ == "__main__":
 #    ax.set_yscale('log')
     
  
-#growth_rates = {'ac':0.29, 'fum':0.47, 'gal':0.17, 'glc':0.60, 'gam':0.39, 'glyc':0.47, 'pyr':0.4, 'succ':0.4, 
-#                  'anaerobic':0.55, 'Chem_05':0.5, 'Chem_035':0.35, 'Chem_02':0.2, 'Chem_012':0.12,
-#                  '42Cdeg':0.65, 'pH6':0.5, 'NaCl_50mM':0.65, 
-#                  'vilu_011':0.11, 'vilu_021':0.21, 'vilu_031':0.31, 'vilu_04':0.40, 'vilu_049':0.49}
-#
-#cond_to_cell_vol = {'ac':2.4e-15, 'fum':2.4e-15, 'gal':1.9e-15, 'glc':3.2e-15, 'gam':2.9e-15, 'glyc':2.3e-15, 
-#	               'pyr':2.1e-15, 'succ':2.4e-15, 'anaerobic':2.9e-15, 'Chem_05':2.6e-15, 'Chem_035':2.4e-15, 
-#                    'Chem_02':2.2e-15, 'Chem_012':2.1e-15, '42Cdeg':2.8e-15, 'pH6':3.1e-15, 'NaCl_50mM':2.8e-15,
-#                    'vilu_011':0.73e-15, 'vilu_021':0.91e-15, 'vilu_031':1.22e-15, 'vilu_04':1.46e-15, 'vilu_049':1.69e-15} # in liter
 #
 ## sort conditions by growth rate
 #growth_conditions = sorted(growth_rates.keys(), key=growth_rates.get)    
