@@ -3,6 +3,8 @@ from cobra.io.sbml import create_cobra_model_from_sbml_file
 from cobra.manipulation.modify import convert_to_irreversible
 from cobra.flux_analysis.variability import flux_variability_analysis
 import os
+from scipy import stats, odr
+import math
 import json
 import csv
 import sys
@@ -133,11 +135,6 @@ class RCAT(MODEL):
         self.V_data = pd.read_csv("cache/pFBA_dist_across_conditions.csv")
         self.V_data.set_index('reactions', inplace=True)
 
-        self.pFVA_ranges = pd.read_csv("cache/reactions_to_pfva_ranges.csv")
-        self.pFVA_ranges.set_index('reactions', inplace=True) 
-        self.pFVA_ranges = self.pFVA_ranges * 6.02214129e23 / 1000 / 3600 
-        self.rcat_err = (self.pFVA_ranges / self.V_data)
-
     def _get_enzyme_abundance(self, proteomics_fname):
         '''
             map proteomics data to the cobra model reactions
@@ -162,7 +159,22 @@ class RCAT(MODEL):
         return abundance
 
     def _calculate_pFBA(self, growth_params):
-        
+        '''
+            calculates parsimoniuos FBA - the objective function is
+            to minimize the total sum of fluxes
+            
+            Arguments:
+                growth parametres:
+                    carbon source
+                    growth_rate [1/h]
+                    oxygen uptake rate [mmol/gCDW/h]
+                    
+            Returns:
+                pandas DataFrame flux distribution of COBRA model reactions
+                in units of molecules/gCDW/s
+                
+        '''        
+
         convert_to_irreversible(self.model)            
 
         cond = growth_params['carbon']
@@ -172,7 +184,7 @@ class RCAT(MODEL):
         rxns = dict([(r.id, r) for r in self.model.reactions])
         rxns['EX_glc_e'].lower_bound = 0 # uptake of carbon source reaction is initialized    
         try:
-            rxns['EX_' + cond + '_e'].lower_bound = -1000 # redefine sole carbon source uptake reaction in mmol/gr/h
+            rxns['EX_' + cond + '_e'].lower_bound = -18.5 # redefine sole carbon source uptake reaction in mmol/gr/h
         except:
             rxns['EX_glc_e'].lower_bound = -1000
         rxns['Ec_biomass_iJO1366_core_53p95M'].upper_bound = uptake            
@@ -189,6 +201,13 @@ class RCAT(MODEL):
         return flux_dist    
         
     def calculate_enzyme_rates(self):
+        '''
+            calculates the catalytic rate of enzymes by dividing the flux by
+            the copy number of enzymes. 
+            
+            Important: 
+                Data must have matching units
+        '''
         
         # find intercept of measured conditions
         if len(self.E_data.columns) != len(self.V_data.columns):
@@ -206,15 +225,19 @@ class RCAT(MODEL):
         return rcat
 
     def get_sorted_rates(self):
-        
+        '''
+            sorts the catalytic rates of all (enzyme, reaction) pairs
+            
+            Returns:
+                Dictionary woth reaction as keys and sorted array as value
+        '''
         rcat = self.calculate_enzyme_rates()
         rcat.dropna(thresh=self.minimal_conditions, inplace=True)
-        rcat.replace(np.nan, -1, inplace=True)
-
+        
         rcat = rcat.T
         sorted_rates = {}
         for r in rcat:
-            n = rcat[r].values
+            n = rcat[r].dropna().values
             sorted_rates[r] = sorted(n, reverse=True)
 
         return sorted_rates
@@ -279,7 +302,7 @@ class RCAT(MODEL):
         out_flux = self.V_data.join(new_flux, how='outer')
         out_flux.to_csv("cache/pFBA_distribution_across_conditions.csv")
                 
-    def calculate_pFVA(self, growth_params):
+    def calculate_pFVA(self, growth_params, relaxation=1):
         '''
             calculates the uncertainties of flux by running FVA 
             given minimization of the total sum of fluxes
@@ -290,9 +313,9 @@ class RCAT(MODEL):
             Returns:
                 flux_ranges - the range of each flux
         '''
-        
+        title  = growth_params['title']
         cond = growth_params['carbon']
-        uptake = growth_params['growth_rate']
+        growth_rate = growth_params['growth_rate']
         oxy = growth_params['oxygen']
         
         convert_to_irreversible(self.model)
@@ -304,8 +327,8 @@ class RCAT(MODEL):
 
         rxns['EX_o2_e'].lower_bound = oxy
 
-        rxns['Ec_biomass_iJO1366_core_53p95M'].upper_bound = uptake            
-        rxns['Ec_biomass_iJO1366_core_53p95M'].lower_bound = uptake            
+        rxns['Ec_biomass_iJO1366_core_53p95M'].upper_bound = growth_rate            
+        rxns['Ec_biomass_iJO1366_core_53p95M'].lower_bound = growth_rate            
 
         
         fake = Metabolite(id='fake')
@@ -320,28 +343,26 @@ class RCAT(MODEL):
         self.model.add_reaction(flux_counter) 
         self.model.change_objective(flux_counter)
         
-        print "solving pFVA"
+        print "solving pFVA -> " + title + " -> %f relaxation" %relaxation
         fva = flux_variability_analysis(self.model, 
                                         reaction_list=self.model.reactions, 
                                         objective_sense='minimize',
-                                        fraction_of_optimum=1.1)
-#        index=map(lambda x: x.id, self.model.reactions), 
-        flux_ranges = pd.Series(name=growth_params['title'])
-
-        for r, v in fva.iteritems():
-            flux_ranges[r] = v['maximum'] - v['minimum']
-
-        flux_ranges.index.name = 'reactions'
-        flux_ranges.reset_index
-        out_ranges = self.pFVA_ranges.join(flux_ranges, how='outer')
-        out_ranges.to_csv("cache/reactions_to_pfva_ranges.csv", header=True)
-
-        return flux_ranges
-
-    def get_rcat_max_err(self):
-        return self.rcat_err.median(axis=1)    
+                                        fraction_of_optimum=relaxation)
+        return fva
 
     def manually_remove_reactions(self, reactions):
+        '''
+            some reactions are mannualy removed from the analyis
+            as there might be issues with annotations 
+            or error prone flux calculation
+            
+            Arguments:
+                reaction list
+                
+            Returns:
+                new list of reactions with the problematic reactions removed
+        '''
+                
         # PPKr_reverse reaction is used for ATP generation from ADP 
         # in the FBA model. Nevertheless, acording to EcoCyc, it is used to 
         # to generate polyP (inorganic phosphate) chains from ATP and it is not
@@ -355,66 +376,154 @@ class RCAT(MODEL):
         s = pd.DataFrame(s, index=['std'])
         s.index.name = 'reactions'
         return s.T
+
+class PLOT_DATA(RCAT):
+
+    def __init__(self, model):
+        MODEL.__init__(self, model)    
+
+    def plot_kcat_rcat_correlation(self, x, y, fig, ax, color, edge, 
+                                   yerr=None, labels=[]):
+    
+        logx = np.log10(x)
+        logy = np.log10(y)
+        
+        newx = logx
+        newx = np.append(newx, 4.0)
+        newx = np.append(-4.0, newx)
+        
+        ax.scatter(logx, logy,s=55, c=color, marker='o', edgecolor=edge)
+        
+        ax.errorbar(logx, logy, 
+                    yerr=np.log10(yerr), barsabove=False, 
+                    fmt=None, ecolor='k', alpha=0.4)
+                    
+        ax.plot([-4, 4], [-4,4], 'k', ls='--')
+         
+        #Define function for scipy.odr
+        fit_func = lambda B,x: B[0]*x + B[1]
+        
+        #Fit the data using scipy.odr
+        Model = odr.Model(fit_func)
+        Data = odr.RealData(logx, logy)
+        Odr = odr.ODR(Data, Model, beta0=[1,1])
+        output = Odr.run()
+        #output.pprint()
+        beta = output.beta
+        betastd = output.sd_beta
+        print beta, betastd
+        ax.plot(newx, fit_func(beta, newx), color='#FF0000')
+                
+        b_to_r = self.map_model_reaction_to_genes().set_index(0)
+        
+        if labels!=[]:
+            ann = []
+            for r in labels:
+                ann.append(ax.text(logx[r]+0.15, logy[r], self.gene_names[b_to_r.loc[r][1]], ha='left'))
+                
+            mask = np.zeros(fig.canvas.get_width_height(), bool)
+            
+            fig.canvas.draw()
+#            
+            for a in ann:
+                bbox = a.get_window_extent()
+                x0 = int(bbox.x0)
+                x1 = int(math.ceil(bbox.x1))
+                y0 = int(bbox.y0)
+                y1 = int(math.ceil(bbox.y1))
+            
+                s = np.s_[x0:x1+1, y0:y1+1]
+                if np.any(mask[s]):
+                    a.set_visible(False)
+                else:
+                    mask[s] = True
+    
+        ax.set_xlim(-4,4)
+        ax.set_ylim(-4,4)
+
+        cor, pval = stats.pearsonr(logx, logy)
+        rmse = np.sqrt( output.sum_square / len(x) )
+        print "r^2 = %.3f, pval = %.2e"%(cor**2, pval)
+        print "rmse = %.3f" % rmse    
+        return output
+
 if __name__ == "__main__":
 
     model_fname = "data/iJO1366_curated.xml"
     model = create_cobra_model_from_sbml_file(model_fname)
     rate = RCAT(model)
 
-    growth_conditions = csv.DictReader(open("data/growth_conditions.csv", 'r'))
 
 
-    kcat = rate.get_kcat_of_model_reactions()
-    rcat = rate.calculate_enzyme_rates()    
-    rcat_max = rate.get_rcat_second_max()
-    rcat_median = rcat.median(axis=1)    
-    yerr = rate.get_rcat_max()
-    
-    r = kcat.index & rcat_max.index
-    r = rate.manually_remove_reactions(r)
 
-    import matplotlib.pyplot as plt
-    fig = plt.figure(figsize=(8,8))
-    ax = plt.axes()
-
-
-#    
-#    ax.scatter(kcat[r], rcat_max[r], color='r')    
-
-#    ax.set_xscale('log')    
-#    ax.set_yscale('log')    
-#    plt.draw()    
-#    plt.xlim(1e-4, 1e4)
-#    plt.ylim(1e-4, 1e4)    
-#
-    from plot_data import plot
-    plot(kcat[r], rcat_max[r], fig, ax, 
-         color='#FFB84D', edge='none', 
-         labels=r, limits = np.array([1e-4,1e4]))
-
-    t = r
-    for t in r:
-        d = [[rcat_max[t]-rcat_median[t]], [yerr[t]]]
-        len_d = np.abs(np.log10(d[1][0]/d[0][0]))
-        if len_d >= 0:
+    for frac in [1.001, 1.01, 1.1]:
+        growth_conditions = csv.DictReader(open("data/growth_conditions.csv", 'r'))
+        output = pd.read_csv('cache/pFVA_ranges_template.csv').set_index('Unnamed: 0')
+        for i, c in enumerate(growth_conditions):    
+            model = create_cobra_model_from_sbml_file(model_fname)
+            rate = RCAT(model)
             
-            ax.errorbar(kcat[t], rcat_max[t], 
-                        yerr=d,
-                        uplims=False,
-                        lolims=False,
-                        barsabove=True,
-                        fmt=None, 
-                        ecolor='b')
+            title  = c['title']
+            pfva = rate.calculate_pFVA(c, relaxation=frac)
+            
+            for r, v in pfva.iteritems():
     
-    ax.set_ylabel(r'in vivo $r^{max}_{cat}$ $\left[s^{-1}\right]$', size=20)
-    ax.set_xlabel(r'in vitro $k_{cat}$ $\left[s^{-1}\right]$', size=20)
+                output[title][str((r, 'minimum'))] = v['minimum']
+                output[title][str((r, 'maximum'))] = v['maximum']
+            
+        output.to_csv('cache/pFVA_ranges_at_%f.csv' %frac)
+        print "DONE!"
 
-    a = plt.axes([0.2, 0.7, .21, .21])
-    plt.hist(np.log10((yerr[r]-rcat.loc[r].median(axis=1))/rcat_max[r]))
-    a.set_xticks(np.arange(-1,1.1,0.5))
-    plt.tight_layout()
-    plt.show()
-    fig.savefig('res/kcat_rcatmax_correlation_std_by_ron.svg')
+
+#    kcat = rate.get_kcat_of_model_reactions()
+#    rcat = rate.calculate_enzyme_rates()    
+#    rcat_max = rate.get_rcat_second_max()
+#    rcat_median = rcat.median(axis=1)    
+#    yerr = rate.get_rcat_max()
+#    
+#    r = kcat.index & rcat_max.index
+#    r = rate.manually_remove_reactions(r)
+#
+#    import matplotlib.pyplot as plt
+#    fig = plt.figure(figsize=(8,8))
+#    ax = plt.axes()
+#
+#
+##    
+##    ax.scatter(kcat[r], rcat_max[r], color='r')    
+#
+##    ax.set_xscale('log')    
+##    ax.set_yscale('log')    
+##    plt.draw()    
+##    plt.xlim(1e-4, 1e4)
+##    plt.ylim(1e-4, 1e4)    
+##
+#    from plot_data import plot
+#    plot(kcat[r], rcat_max[r], fig, ax, 
+#         color='#FFB84D', edge='none', 
+#         labels=r, limits = np.array([1e-4,1e4]))
+#
+#    t = r
+#    for t in r:
+#        d = [[rcat_max[t]-rcat_median[t]], [yerr[t]]]
+#        len_d = np.abs(np.log10(d[1][0]/d[0][0]))
+#        if len_d >= 0:
+#            
+#            ax.errorbar(kcat[t], rcat_max[t], 
+#                        yerr=d,
+#                        uplims=False,
+#                        lolims=False,
+#                        barsabove=True,
+#                        fmt=None, 
+#                        ecolor='b')
+#    
+#
+#
+#    a = plt.axes([0.2, 0.7, .21, .21])
+#    plt.hist(np.log10((yerr[r]-rcat.loc[r].median(axis=1))/rcat_max[r]))
+#    a.set_xticks(np.arange(-1,1.1,0.5))
+#
+#    fig.savefig('res/kcat_rcatmax_correlation_std_by_ron.svg')
 
 #    from scipy import stats
 
