@@ -221,7 +221,7 @@ class RCAT(MODEL):
 
         # replace zero and inf values with nan
         rcat.replace([0, np.inf, -np.inf], np.nan, inplace=True)
-
+        rcat.dropna(thresh=self.minimal_conditions, inplace=True)
         return rcat
 
     def get_sorted_rates(self):
@@ -232,7 +232,6 @@ class RCAT(MODEL):
                 Dictionary woth reaction as keys and sorted array as value
         '''
         rcat = self.calculate_enzyme_rates()
-        rcat.dropna(thresh=self.minimal_conditions, inplace=True)
         
         rcat = rcat.T
         sorted_rates = {}
@@ -274,7 +273,6 @@ class RCAT(MODEL):
     def get_best_condition(self):
         
         rcat = self.calculate_enzyme_rates()       
-        rcat.dropna(thresh=self.minimal_conditions, inplace=True)
         return rcat.idxmax(axis=1)       
         
     def get_kcat_of_model_reactions(self):
@@ -394,6 +392,7 @@ class PLOT_DATA(RCAT):
         
         ax.scatter(logx, logy,s=55, c=color, marker='o', edgecolor=edge)
         
+        
         ax.errorbar(logx, logy, 
                     yerr=np.log10(yerr), barsabove=False, 
                     fmt=None, ecolor='k', alpha=0.4)
@@ -419,7 +418,9 @@ class PLOT_DATA(RCAT):
         if labels!=[]:
             ann = []
             for r in labels:
-                ann.append(ax.text(logx[r]+0.15, logy[r], self.gene_names[b_to_r.loc[r][1]], ha='left'))
+                ann.append(ax.text(logx[r]+0.15, logy[r], 
+                                   self.gene_names[b_to_r.loc[r][1]], 
+                                    ha='left', va='center'))
                 
             mask = np.zeros(fig.canvas.get_width_height(), bool)
             
@@ -453,26 +454,29 @@ if __name__ == "__main__":
     model = create_cobra_model_from_sbml_file(model_fname)
     rate = RCAT(model)
 
+    growth_conditions = csv.DictReader(open("data/growth_conditions.csv", 'r'))
+    for i, c in enumerate(growth_conditions):    
+        model = create_cobra_model_from_sbml_file(model_fname)
+        rate = RCAT(model)
+        
 
-
-
-    for frac in [1.001, 1.01, 1.1]:
-        growth_conditions = csv.DictReader(open("data/growth_conditions.csv", 'r'))
-        output = pd.read_csv('cache/pFVA_ranges_template.csv').set_index('Unnamed: 0')
-        for i, c in enumerate(growth_conditions):    
-            model = create_cobra_model_from_sbml_file(model_fname)
-            rate = RCAT(model)
-            
-            title  = c['title']
-            pfva = rate.calculate_pFVA(c, relaxation=frac)
-            
-            for r, v in pfva.iteritems():
-    
-                output[title][str((r, 'minimum'))] = v['minimum']
-                output[title][str((r, 'maximum'))] = v['maximum']
-            
-        output.to_csv('cache/pFVA_ranges_at_%f.csv' %frac)
-        print "DONE!"
+#    for frac in [1.0]:#, 1.001, 1.01, 1.1]:
+#        growth_conditions = csv.DictReader(open("data/growth_conditions.csv", 'r'))
+#        output = pd.read_csv('cache/pFVA_ranges_template.csv').set_index('Unnamed: 0')
+#        for i, c in enumerate(growth_conditions):    
+#            model = create_cobra_model_from_sbml_file(model_fname)
+#            rate = RCAT(model)
+#            
+#            title  = c['title']
+#            pfva = rate.calculate_pFVA(c, relaxation=frac)
+#            
+#            for r, v in pfva.iteritems():
+#    
+#                output[title][str((r, 'minimum'))] = v['minimum']
+#                output[title][str((r, 'maximum'))] = v['maximum']
+#            
+#        output.to_csv('cache/pFVA_ranges_at_%f.csv' %frac)
+#        print "DONE!"
 
 
 #    kcat = rate.get_kcat_of_model_reactions()

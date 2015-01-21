@@ -23,7 +23,7 @@ reactions = kcat.index & rcat_max.index
 reactions = rate.manually_remove_reactions(reactions)
 
 
-yerr = pd.Series({k:np.std(np.log10(np.array(v[0:3]))) 
+yerr = pd.Series({k:np.std(np.array(v[0:3])) 
                     for k,v in sorted_rates.iteritems()
                     if k in reactions})
                         
