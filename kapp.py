@@ -300,6 +300,15 @@ class RCAT(MODEL):
         out_flux = self.V_data.join(new_flux, how='outer')
         out_flux.to_csv("cache/pFBA_distribution_across_conditions.csv")
                 
+    def delete_non_expressed_genes(self):
+        
+        """
+            delete genes from model if they are not represented in the 
+            proteomics data of a given condition
+            
+            A
+        """
+    
     def calculate_pFVA(self, growth_params, relaxation=1):
         '''
             calculates the uncertainties of flux by running FVA 
