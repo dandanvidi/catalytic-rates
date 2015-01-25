@@ -15,7 +15,11 @@ cell_volumes = growth_conditions.cell_volume_l # cell volume in liter
 h = h*cell_volumes[h.columns]/1e-15 # convert from # copies/cell to copies/fl[cell]
 
 p = h.join(v, how='outer')
+
+p = (p[p>10])# remove genes with less then 10 copies per fl cytoplasm
+
 p = p * 1e12 / 0.3 # convert from copies/fl(cytoplasme) to copies/gCDW
-#
+
 p.dropna(how='all', inplace=True)
 
+p.to_csv('cache/gene_concentrations_copies_gCDW.csv')
