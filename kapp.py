@@ -422,14 +422,14 @@ class PLOT_DATA(RCAT):
         newx = np.append(newx, 4.0)
         newx = np.append(-4.0, newx)
         
-        ax.scatter(logx, logy,s=55, c=color, marker='o', edgecolor=edge)
+        ax.scatter(x, y,s=55, c=color, marker='o', edgecolor=edge, alpha=0.75)
         
         if yerr != 'none':
-            ax.errorbar(logx, logy, 
-                        yerr=np.log10(yerr), barsabove=False, 
+            ax.errorbar(x, y, 
+                        yerr=yerr, barsabove=False, 
                         fmt=None, ecolor='k', alpha=0.4)
                     
-        ax.plot([-4, 4], [-4,4], 'k', ls='--')
+        ax.plot([1e-4, 1e4], [1e-4,1e4], 'k', ls='--')
          
         #Define function for scipy.odr
         fit_func = lambda B,x: B[0]*x + B[1]
@@ -441,37 +441,43 @@ class PLOT_DATA(RCAT):
         output = Odr.run()
         #output.pprint()
         beta = output.beta
-        betastd = output.sd_beta
-        ax.plot(newx, fit_func(beta, newx), color='#FF0000')
+        ax.plot(10**newx, 10**fit_func(beta, newx), color='#FF0000')
                 
+    
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        
+                
+        
         b_to_r = self.map_model_reaction_to_genes()
         
         if labels!=[]:
             ann = []
             for r in labels:
-                ann.append(ax.text(logx[r]+0.15, logy[r], 
+                ann.append(ax.text(x[r], y[r], 
                                    self.gene_names[b_to_r[r]], 
-                                    ha='left', va='center'))
+                                    ha='center', va='center'))
                 
             mask = np.zeros(fig.canvas.get_width_height(), bool)
             
             fig.canvas.draw()
 #            
-            for a in ann:
+            for i, a in enumerate(ann):
                 bbox = a.get_window_extent()
                 x0 = int(bbox.x0)
                 x1 = int(math.ceil(bbox.x1))
                 y0 = int(bbox.y0)
                 y1 = int(math.ceil(bbox.y1))
             
-                s = np.s_[x0:x1+1, y0:y1+1]
+                s = np.s_[x0:x1, y0:y1]
                 if np.any(mask[s]):
                     a.set_visible(False)
                 else:
                     mask[s] = True
     
-        ax.set_xlim(-4,4)
-        ax.set_ylim(-4,4)
+        
+        ax.set_xlim(1e-4,1e4)
+        ax.set_ylim(1e-4,1e4)
 
         cor, pval = stats.pearsonr(logx, logy)
         rmse = np.sqrt( output.sum_square / len(x) )
