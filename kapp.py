@@ -155,12 +155,10 @@ class RCAT(MODEL):
         self.growth_conditions = pd.DataFrame.from_csv("data/growth_conditions.csv")
         self.growth_conditions.sort(axis=0, columns='growth_rate_1_h', inplace=True)
 
-        self.minimal_conditions = 5
-        self.E_data = pd.read_csv("cache/enzyme_conc_across_conditions.csv")
-        self.E_data.set_index('reactions', inplace=True)
-
-        self.V_data = pd.read_csv("cache/pFBA_dist_across_conditions.csv")
-        self.V_data.set_index('reactions', inplace=True)
+        self.V_data = pd.DataFrame.from_csv('cache/fluxes_[molecules_per_second_per_gCDW].csv')        
+        self.E_data = pd.DataFrame.from_csv("cache/expression_[copies_per_gCDW].csv")
+        
+        self.minimal_conditions = 7
 
     def _get_enzyme_abundance(self, proteomics_fname):
         '''
@@ -227,7 +225,7 @@ class RCAT(MODEL):
 
         return flux_dist    
         
-    def calculate_enzyme_rates(self, v, E):
+    def calculate_enzyme_rates(self):
         '''
             calculates the catalytic rate of enzymes by dividing the flux by
             the copy number of enzymes. 
@@ -235,11 +233,11 @@ class RCAT(MODEL):
             Important: 
                 Data must have matching units
         '''
-        
-        conditions = v.columns & E.columns
+        V = self.V_data.drop(['bnumber', 'gene_name'], axis=1)        
+        E = self.E_data.drop(['bnumber', 'gene_name'], axis=1)
         
         # calculate rats by dividing flux by proteomics
-        rcat = self.V_data[conditions] / self.E_data[conditions]
+        rcat = V / E
 
         # replace zero and inf values with nan
         rcat.replace([0, np.inf, -np.inf], np.nan, inplace=True)
@@ -263,40 +261,6 @@ class RCAT(MODEL):
             sorted_rates[r] = sorted(n, reverse=True)
 
         return sorted_rates
-
-    def get_rcat_max_range(self):
-
-        rates = self.get_sorted_rates()
-        mrange = {k:[v[2], v[0]] for k,v in rates.iteritems()}
-        max_range = pd.DataFrame(mrange, index=['low_delta', 'high_delta'])
-        return max_range.T
-        
-    def get_rcat_max(self):
-        
-        rates = self.get_sorted_rates()
-        max_rates = {k:v[0] for k,v in rates.iteritems()}
-        max_rate = pd.Series(max_rates)
-        return max_rate
-            
-    def get_rcat_second_max(self):
-        
-        rates = self.get_sorted_rates()
-        max_rates = {k:v[1] for k,v in rates.iteritems()}
-        second_max = pd.Series(max_rates)
-        return second_max
-
-    def get_rcat_mean_max(self):
-        
-        rates = self.get_sorted_rates()
-        max_rates = {k:v[v>0] for k,v in rates.iteritems()}
-        max_rates = {k:np.mean(v[0:3]) for k,v in rates.iteritems()}
-        mean_max = pd.Series(max_rates)
-        return mean_max
-        
-    def get_best_condition(self):
-        
-        rcat = self.calculate_enzyme_rates()       
-        return rcat.idxmax(axis=1)       
         
     def get_kcat_of_model_reactions(self):
         
