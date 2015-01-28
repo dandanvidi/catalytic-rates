@@ -104,7 +104,7 @@ class MODEL(object):
         '''
 
         convert_to_irreversible(self.model)
-        r_to_single_gene = {}
+        r_to_single_gene = pd.Series()
 
         # remove reactions which can be catalysed by more than one gene
         for r in self.model.reactions:
@@ -118,15 +118,42 @@ class MODEL(object):
         r_to_single_gene["PFK"] = "b3916" #  6-phosphofructokinase                
         r_to_single_gene["RPI"] = "b2914" #  ribose-5-phosphate isomerase A                
         
-        r_to_single_gene = pd.DataFrame(r_to_single_gene.items())
-        r_to_single_gene.to_csv("cache/reactions_to_genes_mapping.csv")
+#        r_to_single_gene.to_csv("cache/reactions_to_genes_mapping.csv")
 #
         return r_to_single_gene
 #        
+    def map_genes_to_model_reaction(self):
+        ''' 
+            find and match all genes in E. coli to reactions in the model 
+            that are catalyzed by a single gene
+        '''
+
+        convert_to_irreversible(self.model)
+        r_to_single_gene = pd.Series()
+
+        # remove reactions which can be catalysed by more than one gene
+        for r in self.model.reactions:
+            genes = map(lambda x: x.id, r.genes)
+            if len(genes) == 1 and genes[0]:
+                r_to_single_gene[genes[0]] = r.id
+        
+        # manual additions of genes with only one active isoenzyme 
+        r_to_single_gene["b3829"] = "METS" # metE - cobalamin-independent homocysteine transmethylase
+        r_to_single_gene["b0126"] = "HCO3E"# can - carbonic anhydrase
+        r_to_single_gene["b3916"] = "PFK" #  6-phosphofructokinase                
+        r_to_single_gene["b2914"] = "RPI" #  ribose-5-phosphate isomerase A                
+        
+#        r_to_single_gene.to_csv("cache/genes_to_reactions_mapping.csv")
+#
+        return r_to_single_gene
+        
 class RCAT(MODEL):
     
     def __init__(self, model):
         MODEL.__init__(self, model)
+
+        self.growth_conditions = pd.DataFrame.from_csv("data/growth_conditions.csv")
+        self.growth_conditions.sort(axis=0, columns='growth_rate_1_h', inplace=True)
 
         self.minimal_conditions = 5
         self.E_data = pd.read_csv("cache/enzyme_conc_across_conditions.csv")
@@ -158,7 +185,7 @@ class RCAT(MODEL):
         
         return abundance
 
-    def _calculate_pFBA(self, growth_params):
+    def _calculate_pFBA(self, title, growth_params):
         '''
             calculates parsimoniuos FBA - the objective function is
             to minimize the total sum of fluxes
@@ -178,8 +205,8 @@ class RCAT(MODEL):
         convert_to_irreversible(self.model)            
 
         cond = growth_params['carbon']
-        uptake = growth_params['growth_rate']
-        oxy = growth_params['oxygen']
+        growth_rate = growth_params['growth_rate_1_h']
+        oxy = growth_params['oxygen_uptake_mmol_gCDW_h']
                 
         rxns = dict([(r.id, r) for r in self.model.reactions])
         rxns['EX_glc_e'].lower_bound = 0 # uptake of carbon source reaction is initialized    
@@ -187,9 +214,9 @@ class RCAT(MODEL):
             rxns['EX_' + cond + '_e'].lower_bound = -18.5 # redefine sole carbon source uptake reaction in mmol/gr/h
         except:
             rxns['EX_glc_e'].lower_bound = -1000
-        rxns['Ec_biomass_iJO1366_core_53p95M'].upper_bound = uptake            
+        rxns['Ec_biomass_iJO1366_core_53p95M'].upper_bound = growth_rate            
         rxns['EX_o2_e'].lower_bound = oxy
-        print "solving model for %s..." %growth_params['title'],
+        print "solving model for %s..." %title,
         optimize_minimal_flux(self.model, already_irreversible=True)
         print "\t GR: %.02f 1/h" %self.model.solution.f
         
@@ -200,7 +227,7 @@ class RCAT(MODEL):
 
         return flux_dist    
         
-    def calculate_enzyme_rates(self):
+    def calculate_enzyme_rates(self, v, E):
         '''
             calculates the catalytic rate of enzymes by dividing the flux by
             the copy number of enzymes. 
@@ -209,12 +236,7 @@ class RCAT(MODEL):
                 Data must have matching units
         '''
         
-        # find intercept of measured conditions
-        if len(self.E_data.columns) != len(self.V_data.columns):
-            print "the number of conditions is not identical \
-                  in flux and proteomics, thus the intersect is used"
-
-        conditions = self.E_data.columns & self.V_data.columns
+        conditions = v.columns & E.columns
         
         # calculate rats by dividing flux by proteomics
         rcat = self.V_data[conditions] / self.E_data[conditions]
@@ -222,6 +244,7 @@ class RCAT(MODEL):
         # replace zero and inf values with nan
         rcat.replace([0, np.inf, -np.inf], np.nan, inplace=True)
         rcat.dropna(thresh=self.minimal_conditions, inplace=True)
+
         return rcat
 
     def get_sorted_rates(self):
@@ -309,7 +332,7 @@ class RCAT(MODEL):
             A
         """
     
-    def calculate_pFVA(self, growth_params, relaxation=1):
+    def calculate_pFVA(self, title, growth_params, relaxation=1):
         '''
             calculates the uncertainties of flux by running FVA 
             given minimization of the total sum of fluxes
@@ -320,14 +343,15 @@ class RCAT(MODEL):
             Returns:
                 flux_ranges - the range of each flux
         '''
-        title  = growth_params['title']
-        cond = growth_params['carbon']
-        growth_rate = growth_params['growth_rate']
-        oxy = growth_params['oxygen']
         
-        convert_to_irreversible(self.model)
+        model = deepcopy(self.model)        
+        cond = growth_params['carbon']
+        growth_rate = growth_params['growth_rate_1_h']
+        oxy = growth_params['oxygen_uptake_mmol_gCDW_h']
+        
+        convert_to_irreversible(model)
 
-        rxns = dict([(r.id, r) for r in self.model.reactions])
+        rxns = dict([(r.id, r) for r in model.reactions])
 
         rxns['EX_glc_e'].lower_bound = 0 # uptake of carbon source reaction is initialized    
         rxns['EX_' + cond + '_e'].lower_bound = -1000 # redefine sole carbon source uptake reaction in mmol/gr/h
@@ -337,22 +361,21 @@ class RCAT(MODEL):
         rxns['Ec_biomass_iJO1366_core_53p95M'].upper_bound = growth_rate            
         rxns['Ec_biomass_iJO1366_core_53p95M'].lower_bound = growth_rate            
 
-        
         fake = Metabolite(id='fake')
-        self.model.add_metabolites(fake)        
+        model.add_metabolites(fake)        
                 
-        for r in self.model.reactions:
+        for r in model.reactions:
             r.add_metabolites({fake:1})
             
         flux_counter = Reaction(name='flux_counter')
         flux_counter.add_metabolites(metabolites={fake:-1})                
 
-        self.model.add_reaction(flux_counter) 
-        self.model.change_objective(flux_counter)
+        model.add_reaction(flux_counter) 
+        model.change_objective(flux_counter)
         
         print "solving pFVA -> " + title + " -> %f relaxation" %relaxation
-        fva = flux_variability_analysis(self.model, 
-                                        reaction_list=self.model.reactions, 
+        fva = flux_variability_analysis(model, 
+                                        reaction_list=model.reactions, 
                                         objective_sense='minimize',
                                         fraction_of_optimum=relaxation)
         return fva
@@ -389,8 +412,8 @@ class PLOT_DATA(RCAT):
     def __init__(self, model):
         MODEL.__init__(self, model)    
 
-    def plot_kcat_rcat_correlation(self, x, y, fig, ax, color, edge, 
-                                   yerr=None, labels=[]):
+    def plot_kcat_rcat_correlation(self, x, y, fig, ax, color='b', edge='none', 
+                                   yerr='none', labels=[]):
     
         logx = np.log10(x)
         logy = np.log10(y)
@@ -401,10 +424,10 @@ class PLOT_DATA(RCAT):
         
         ax.scatter(logx, logy,s=55, c=color, marker='o', edgecolor=edge)
         
-        
-        ax.errorbar(logx, logy, 
-                    yerr=np.log10(yerr), barsabove=False, 
-                    fmt=None, ecolor='k', alpha=0.4)
+        if yerr != 'none':
+            ax.errorbar(logx, logy, 
+                        yerr=np.log10(yerr), barsabove=False, 
+                        fmt=None, ecolor='k', alpha=0.4)
                     
         ax.plot([-4, 4], [-4,4], 'k', ls='--')
          
@@ -419,16 +442,15 @@ class PLOT_DATA(RCAT):
         #output.pprint()
         beta = output.beta
         betastd = output.sd_beta
-        print beta, betastd
         ax.plot(newx, fit_func(beta, newx), color='#FF0000')
                 
-        b_to_r = self.map_model_reaction_to_genes().set_index(0)
+        b_to_r = self.map_model_reaction_to_genes()
         
         if labels!=[]:
             ann = []
             for r in labels:
                 ann.append(ax.text(logx[r]+0.15, logy[r], 
-                                   self.gene_names[b_to_r.loc[r][1]], 
+                                   self.gene_names[b_to_r[r]], 
                                     ha='left', va='center'))
                 
             mask = np.zeros(fig.canvas.get_width_height(), bool)
@@ -463,10 +485,10 @@ if __name__ == "__main__":
     model = create_cobra_model_from_sbml_file(model_fname)
     rate = RCAT(model)
 
-    growth_conditions = csv.DictReader(open("data/growth_conditions.csv", 'r'))
-    for i, c in enumerate(growth_conditions):    
-        model = create_cobra_model_from_sbml_file(model_fname)
-        rate = RCAT(model)
+#    growth_conditions = csv.DictReader(open("data/growth_conditions.csv", 'r'))
+#    for i, c in enumerate(growth_conditions):    
+#        model = create_cobra_model_from_sbml_file(model_fname)
+#        rate = RCAT(model)
         
 
 #    for frac in [1.0]:#, 1.001, 1.01, 1.1]:
