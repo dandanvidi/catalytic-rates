@@ -158,7 +158,7 @@ class RCAT(MODEL):
         self.V_data = pd.DataFrame.from_csv('cache/fluxes_[molecules_per_second_per_gCDW].csv')        
         self.E_data = pd.DataFrame.from_csv("cache/expression_[copies_per_gCDW].csv")
         
-        self.minimal_conditions = 7
+        self.minimal_conditions = 1
 
     def _get_enzyme_abundance(self, proteomics_fname):
         '''
@@ -374,7 +374,31 @@ class RCAT(MODEL):
 class PLOT_DATA(RCAT):
 
     def __init__(self, model):
-        MODEL.__init__(self, model)    
+        RCAT.__init__(self, model)    
+
+    def expression_plot(self, e_change, v_change, ax, legend=True):
+    
+        ax.hist(e_change.dropna(), label=r'$\Delta E$', 
+                facecolor=(1.0,0.6,0.6), edgecolor=(0.5, 0.3, 0.3), histtype='stepfilled')
+        ax.axvline(e_change.median(), 0, 1, c=(0.6, 0, 0), ls='-', 
+                   lw=3, label=r'$\Delta E$ $\mathrm{median}$')
+        ax.axvline(v_change.median(), 0, 1, lw=3, c='k', ls=':', 
+                   label=r'$\Delta v$ $\mathrm{median}$')
+        
+        if legend:
+            ax.legend(loc='upper left')
+        
+        xlabels = [2**i for i in np.arange(-3,0)] + [2**i for i in np.arange(0,5)]
+        ax.set_xlim(-3,4)
+        ax.set_xticklabels(xlabels)
+        ax.set_xlabel('fold change', size=13)
+
+        #ax.grid()
+
+#        ax.arrow(e_change.median(), 30, v_change.median()-e_change.median(), 0,
+#                 head_width=0.05, head_length=0.1,
+#                 fc='k', ec='k')
+
 
     def plot_kcat_rcat_correlation(self, x, y, fig, ax, color='b', edge='none', 
                                    yerr='none', labels=[]):
