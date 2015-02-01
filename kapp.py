@@ -158,7 +158,7 @@ class RCAT(MODEL):
         self.V_data = pd.DataFrame.from_csv('cache/fluxes_[molecules_per_second_per_gCDW].csv')        
         self.E_data = pd.DataFrame.from_csv("cache/expression_[copies_per_gCDW].csv")
         
-        self.minimal_conditions = 1
+        self.minimal_conditions = 0
 
     def _get_enzyme_abundance(self, proteomics_fname):
         '''
@@ -241,10 +241,16 @@ class RCAT(MODEL):
 
         # replace zero and inf values with nan
         rcat.replace([0, np.inf, -np.inf], np.nan, inplace=True)
-        rcat.dropna(thresh=self.minimal_conditions, inplace=True)
+        rcat.dropna(how='all', inplace=True)
 
         return rcat
 
+    def get_rcat_max(self, minimal_conditions=5):
+
+        rcat = self.calculate_enzyme_rates()
+        rcat.dropna(thresh=minimal_conditions, inplace=True)
+        return rcat.max(axis=1)
+        
     def get_sorted_rates(self):
         '''
             sorts the catalytic rates of all (enzyme, reaction) pairs
