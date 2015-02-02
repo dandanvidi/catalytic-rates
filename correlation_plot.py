@@ -26,12 +26,12 @@ ax = plt.axes(axisbg='0.95')
 report = PLOT_DATA(model).plot_kcat_rcat_correlation(kcat, rmax, fig, ax, 
                                 color='#FFB84D', yerr='none', labels=reactions)
 
-ax.set_ylabel(r'in vivo $r_{\mathrm{cat, \/max}}$ $\left[s^{-1}\right]$', size=20, style='italic')
+ax.set_ylabel(r'in vivo $r^{\mathrm{max}}_{\mathrm{cat}}$ $\left[s^{-1}\right]$', size=20, style='italic')
 ax.set_xlabel(r'in vitro $k_{\mathrm{cat}}$ $\left[s^{-1}\right]$', size=20)
 ax.tick_params(axis='both', which='both', top='off', right='off')
 
 plt.tight_layout()
-plt.savefig('res/rcat_rmax_correlation.pdf')
+plt.savefig('res/kcat_rmax_correlation.pdf')
 
 fig = plt.figure(figsize=(8,5))
 ax = plt.axes(axisbg='0.95')
