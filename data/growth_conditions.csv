@@ -1,22 +1,22 @@
-title,carbon,growth_rate_1_h,oxygen_uptake_mmol_gCDW_h,cell_volume_l
-Chemostat_vilu_011,glc,0.11,-1000,2.1E-015
-Chemostat_heinmann_012,glc,0.12,-1000,2.1E-015
-galactose_heinmann,gal,0.17,-1000,1.9E-015
-Chemostat_heinmann_02,glc,0.2,-1000,2.2E-015
-Chemostat_vilu_021,glc,0.21,-1000,2.2E-015
-acetate_heinmann,ac,0.29,-1000,2.4E-015
-Chemostat_vilu_031,glc,0.31,-1000,2.3E-015
-Chemostat_heinmann_035,glc,0.35,-1000,2.4E-015
-glucosamine_heinmann,gam,0.39,-1000,2.9E-015
-pyruvate_heinmann,pyr,0.4,-1000,2.1E-015
-succinate_heinmann,succ,0.4,-1000,2.4E-015
-Chemostat_vilu_04,glc,0.4,-1000,2.5E-015
-fumarate_heinmann,fum,0.47,-1000,2.4E-015
-glycerol_heinmann,glyc,0.47,-1000,2.3E-015
-Chemostat_vilu_049,glc,0.49,-1000,2.6E-015
-Chemostat_heinmann_05,glc,0.5,-1000,2.6E-015
-pH6_heinmann,glc,0.5,-1000,3.1E-015
-anaerobic_heinmann,glc,0.55,-0.001,2.9E-015
-glucose_heinmann,glc,0.6,-1000,3.2E-015
-42Cdeg_henimann,glc,0.65,-1000,2.8E-015
-NaCl_50mM_heinmann,glc,0.65,-1000,2.8E-015
+title,alternative_name,carbon,growth_rate_1_h,oxygen_uptake_mmol_gCDW_h,cell_volume_l
+Chemostat_vilu_011,Chemostat 0.11 V,glc,0.11,-1000,2.1E-015
+Chemostat_heinmann_012,Chemostat 0.12 H,glc,0.12,-1000,2.1E-015
+galactose_heinmann,Galactose_H,gal,0.17,-1000,1.9E-015
+Chemostat_heinmann_02,Chemostat 0.2 H,glc,0.2,-1000,2.2E-015
+Chemostat_vilu_021,Chemostat 0.21 V,glc,0.21,-1000,2.2E-015
+acetate_heinmann,Acetate H,ac,0.29,-1000,2.4E-015
+Chemostat_vilu_031,Chemostat 0.31 V,glc,0.31,-1000,2.3E-015
+Chemostat_heinmann_035,Chemostat 0.35 H,glc,0.35,-1000,2.4E-015
+glucosamine_heinmann,Glucosamine H,gam,0.39,-1000,2.9E-015
+pyruvate_heinmann,Pyruvate H,pyr,0.4,-1000,2.1E-015
+succinate_heinmann,Succinate H,succ,0.4,-1000,2.4E-015
+Chemostat_vilu_04,Chemostat 0.4 V,glc,0.4,-1000,2.5E-015
+fumarate_heinmann,Fumarate H,fum,0.47,-1000,2.4E-015
+glycerol_heinmann,Glycerol H,glyc,0.47,-1000,2.3E-015
+Chemostat_vilu_049,Chemostat 0.49 V,glc,0.49,-1000,2.6E-015
+Chemostat_heinmann_05,Chemostat 0.5 H,glc,0.5,-1000,2.6E-015
+pH6_heinmann,pH6 H,glc,0.5,-1000,3.1E-015
+anaerobic_heinmann,Anaerobic,glc,0.55,-0.001,2.9E-015
+glucose_heinmann,Batch H,glc,0.6,-1000,3.2E-015
+42Cdeg_henimann,42C H,glc,0.65,-1000,2.8E-015
+NaCl_50mM_heinmann,NaCl 50mM H,glc,0.65,-1000,2.8E-015

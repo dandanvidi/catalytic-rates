@@ -155,11 +155,16 @@ class RCAT(MODEL):
         self.growth_conditions = pd.DataFrame.from_csv("data/growth_conditions.csv")
         self.growth_conditions.sort(axis=0, columns='growth_rate_1_h', inplace=True)
 
+        self.growth_conditions.drop('anaerobic_heinmann', axis=0, inplace=True)
+        
         self.V_data = pd.DataFrame.from_csv('cache/fluxes_[molecules_per_second_per_gCDW].csv')        
         self.E_data = pd.DataFrame.from_csv("cache/expression_[copies_per_gCDW].csv")
         
-        self.minimal_conditions = 0
-
+        columns = ['bnumber', 'gene_name'] + list(self.growth_conditions.index)
+        
+        self.V_data = self.V_data[columns]
+        self.E_data = self.E_data[columns]
+        
     def _get_enzyme_abundance(self, proteomics_fname):
         '''
             map proteomics data to the cobra model reactions

@@ -40,11 +40,11 @@ for c in efficacy.index:
 max_efficacy = (rmax/kcat).dropna().median()
 ax.hlines(max_efficacy, 0, 0.7, lw=3, color='r', linestyles=':')
 ax.text(.1, max_efficacy+0.01, 
-         r'$\mathit{r}_{\mathrm{cat}}^{\mathrm{max}}$  /  $\mathit{k_{\mathrm{cat}}}$', 
+         r'$r_{\mathrm{cat}}^{\mathrm{max}}$  /  $k_{\mathrm{cat}}$', 
          va='bottom', size=15)
 
 ax.set_xlabel(r'growth rate $\left[s^{-1}\right]$', size=15)
-ax.set_ylabel('median catalytic efficacy', size=15)
+ax.set_ylabel('median catalytic efficacy \n [$r_{\mathrm{cat}} / k_{\mathrm{cat}}]$', size=15)
 
 ax.tick_params(axis='x', which='both', top='off', bottom='on')
 ax.tick_params(axis='y', which='both', left='on', right='off')
@@ -76,7 +76,7 @@ ax.text(.1, kcat.median()+0.01,
          va='bottom', size=15)
 
 ax.set_xlabel(r'growth rate $\left[s^{-1}\right]$', size=15)
-ax.set_ylabel('median catalytic efficacy', size=15)
+ax.set_ylabel('median catalytic rate $[s^{-1}]$', size=15)
 
 ax.tick_params(axis='x', which='both', top='off', bottom='on')
 ax.tick_params(axis='y', which='both', left='on', right='off')
