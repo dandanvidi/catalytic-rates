@@ -382,6 +382,54 @@ class RCAT(MODEL):
         s.index.name = 'reactions'
         return s.T
 
+class MM_KINETICS(RCAT):
+
+    def __init__(self, model):
+        RCAT.__init__(self, model)    
+        
+    def reactions_dG(self, reactions_list=[], c = 1e-3, pH=7.5, I=0.2, T=298.15):
+    
+        if not os.path.exists(CC_CACHE_FNAME):
+            cc = ComponentContribution()
+            cc.save_matfile(CC_CACHE_FNAME)
+        else:
+            cc = ComponentContribution.from_matfile(CC_CACHE_FNAME)    
+            
+        reaction_strings = self.reaction_formula(reactions_list)
+
+
+        reactions = []
+        reac_strings = []
+        for key, val in reaction_strings.iteritems():    
+            reactions.append(key)
+            reac_strings.append(val)
+    
+        Kmodel = KeggModel.from_formulas(reac_strings)
+        Kmodel.add_thermo(cc)
+        dG0_prime, dG0_std = Kmodel.get_transformed_dG0(pH=7.5, I=0.2, T=298.15)
+        # use 1mM as the standard concentration
+        print c
+        conc = np.ones((1, len(Kmodel.cids))) * 1e-3
+
+        for cid in ['C00001']: # set the conc of water as 1M
+            i = Kmodel.cids.index(cid)
+            conc[0, i] = 1
+            
+        r_to_dGc = pd.DataFrame(index = reactions, columns = ['glc', 'glyc', 'ac', 'std'])
+        for condition in ['glc', 'glyc', 'ac']:
+            for ID, cid  in self.known_cids.iteritems(): # set the conc of known metabolites
+                if ID in Kmodel.cids:
+                    i = Kmodel.cids.index(ID)
+                    c = self.metabolites_concentration[condition][cid]
+                    if not np.isnan(c):
+                        conc[0, i] = c
+                
+            dGc_prime = dG0_prime + R * default_T * np.dot(np.log(conc), Kmodel.S).T
+            r_to_dGc[condition] = dGc_prime
+
+        r_to_dGc['std'] = dG0_std
+        r_to_dGc.to_csv('cache/reactions_to_dGc.csv')
+
 class PLOT_DATA(RCAT):
 
     def __init__(self, model):
