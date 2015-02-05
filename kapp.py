@@ -49,7 +49,7 @@ class MODEL(object):
                 value: reactions str in kegg CIDs
         '''
 
-        reaction_list = map(model.reactions.get_by_id, reaction_list)
+        reaction_list = map(self.model.reactions.get_by_id, reaction_list)
         CIDS = self.model_metabolites().kegg_id.dropna().astype('str')
 
 #        #replace all reactions sparse with CID sparses
@@ -386,24 +386,31 @@ class MM_KINETICS(RCAT):
 
     def __init__(self, model):
         RCAT.__init__(self, model)    
-        
-    def reactions_dG(self, reactions_list=[], c = 1e-3, pH=7.5, I=0.2, T=298.15):
-    
-        if not os.path.exists(CC_CACHE_FNAME):
-            cc = ComponentContribution()
-            cc.save_matfile(CC_CACHE_FNAME)
-        else:
-            cc = ComponentContribution.from_matfile(CC_CACHE_FNAME)    
-            
-        reaction_strings = self.reaction_formula(reactions_list)
+        self.CC_CACHE_FNAME = os.path.expanduser('../component-contribution/cache/component_contribution.mat')
 
+        self.metabolites_concentration = pd.read_csv('data/metab_conc.csv') 
+        self.metabolites_concentration.set_index('Compound Id (KEGG)', inplace=True)
+        self.metabolites_concentration.dropna(how='all', inplace=True)
+        
+        self.known_cids = {'C'+'%05i'%c:c for c in self.metabolites_concentration.index}
+
+    def cache_reactions_dG(self, c = 1e-3, pH=7.5, I=0.2, T=298.15):
+    
+        if not os.path.exists(self.CC_CACHE_FNAME):
+            cc = ComponentContribution()
+            cc.save_matfile(self.CC_CACHE_FNAME)
+        else:
+            cc = ComponentContribution.from_matfile(self.CC_CACHE_FNAME)    
+        
+        model_reactions = [r.id for r in self.model.reactions]
+        reaction_strings, sparse = self.reaction_formula(model_reactions)
 
         reactions = []
         reac_strings = []
         for key, val in reaction_strings.iteritems():    
             reactions.append(key)
             reac_strings.append(val)
-    
+            
         Kmodel = KeggModel.from_formulas(reac_strings)
         Kmodel.add_thermo(cc)
         dG0_prime, dG0_std = Kmodel.get_transformed_dG0(pH=7.5, I=0.2, T=298.15)
@@ -430,10 +437,45 @@ class MM_KINETICS(RCAT):
         r_to_dGc['std'] = dG0_std
         r_to_dGc.to_csv('cache/reactions_to_dGc.csv')
 
+    def backwards_reaction_effect(self):
+
+        dG = pd.DataFrame.from_csv('cache/reactions_to_dGc.csv') 
+        dG.drop('std', axis=1, inplace=True)
+        
+        T = 1-np.exp(dG/(R*default_T))
+        T.replace([np.inf, -np.inf], np.nan, inplace=True)
+
+        return dG, T
+
+    def under_saturation_effect(self, include_cofactors=True, include_metabolomics=True):
+
+        reaction_strings, CID_sparse = self.reaction_formula()
+
+        r_to_saturation = pd.DataFrame(index = self.substrates_km().keys(), columns = ['glc', 'glyc', 'ac'])
+        for condition in ['glyc', 'ac', 'glc']:
+            unknown_reactions = set([])
+            for r, sparse in self.substrates_km().iteritems():
+                si = 1
+                for cid, km in sparse.iteritems():
+                    coef = -1*reaction_CID_sparse[r]['C'+'%05i'%cid]
+                    if cid in self.known_cids.values():
+                        conc = self.metabolites_concentration[condition][cid]
+                        if np.isnan(conc):
+                            unknown_reactions.add(r)
+                            conc = 0.1
+                    else:
+                        unknown_reactions.add(r)
+                        conc = 0.1
+#                    s = (km/conc)**coef
+                    s = (conc/km)**coef
+                    si *= s
+                r_to_saturation[condition][r] = si/(1+si)
+        return r_to_saturation, unknown_reactions 
+        
 class PLOT_DATA(RCAT):
 
     def __init__(self, model):
-        RCAT.__init__(self, model)    
+        RCAT.__init__(self, model) 
 
     def expression_plot(self, e_change, v_change, ax, legend=True):
     

@@ -1,11 +1,13 @@
 from kapp import PLOT_DATA
 from cobra.io.sbml import create_cobra_model_from_sbml_file
+from cobra.manipulation.modify import convert_to_irreversible
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
 model_fname = "data/iJO1366_curated.xml"
 model = create_cobra_model_from_sbml_file(model_fname)
+cpnvert_model
 rc = PLOT_DATA(model)
 growth_rates = rc.growth_conditions.growth_rate_1_h
     

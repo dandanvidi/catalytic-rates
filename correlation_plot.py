@@ -14,7 +14,7 @@ R = RCAT(model)
 growth_conditions = R.growth_conditions
 
 kcat = R.get_kcat_of_model_reactions()
-rcat = R.calculate_enzyme_rates()[growth_conditions.index]
+rcat = R.calculate_enzyme_rates()
 rmax = R.get_rcat_max(7)
 
 reactions = rmax.index & kcat.index
