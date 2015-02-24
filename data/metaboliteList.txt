@@ -1,5 +1,7 @@
 abbreviation	name	formula	charge	compartment	kegg_id	cas_id	internal_id	
-camp	cAMP	C10H11N5O6P	-1	Cytosol	C00575		1484809	
+
+camp	cAMP	C10H11N5O6P	-1	Cytosol	C00575		1484809	    
+pimACP	Pimeloyl-[acyl-carrier protein]	C18H31N2O10PRS	-1	Cytosol	C19845		None
 xu5p-L	L-Xylulose 5-phosphate	C5H9O8P	-2	Cytosol	C03291	None	41573	
 mettrna	L-Methionyl-tRNA (Met)	C5H10NOSR	1	Cytosol	C02430		227723	
 succoa	Succinyl-CoA	C25H35N7O19P3S	-5	Cytosol	C00091	604-98-8	33820	
@@ -81,7 +83,7 @@ ckdo	CMP-3-deoxy-D-manno-octulosonate	C17H24N3O15P	-2	Cytosol			1450191
 acmanap	N-Acetyl-D-mannosamine 6-phosphate	C8H14NO9P	-2	Cytosol	C04257	157296-99-6	43459	
 leu-L	L-Leucine	C6H13NO2	0	Extra-organism, Cytosol, Periplasm	C00123	61-90-5	33942	
 cynt	Cyanate	CNO	-1	Extra-organism, Cytosol, Periplasm	C01417	420-05-3	37550	
-1hdec9eg3p	1-hexadec-9-enoyl-sn-glycerol 3-phosphate	C19H35O7P1	-2	Cytosol, Periplasm	c00681		2617406	
+1hdec9eg3p	1-hexadec-9-enoyl-sn-glycerol 3-phosphate	C19H35O7P1	-2	Cytosol, Periplasm	C00681		2617406	
 3dhq	3-Dehydroquinate	C7H9O6	-1	Cytosol	C00944		36436	
 alltt	Allantoate	C4H7N4O4	-1	Cytosol	C00499	99-16-1	35164	
 gbbtn	gamma-butyrobetaine	C7H15NO2	0	Extra-organism, Cytosol, Periplasm	C01181		1489453	
@@ -317,7 +319,7 @@ micit	methylisocitrate	C7H7O7	-3	Cytosol	C04593	20298-95-7	44122
 q8	Ubiquinone-8	C49H74O4	0	Cytosol	C00399	1339-63-5	1438260	
 adphep-LD	ADP-L-glycero-D-manno-heptose	C17H25N5O16P2	-2	Cytosol	C06398		1488036	
 lcts	Lactose	C12H22O11	0	Extra-organism, Cytosol, Periplasm	C00243	63-42-3	34366	
-hdeACP	cis-hexadec-9-enoyl-[acyl-carrier protein] (n-C16:1)	C27H49N2O8PRS	-1	Cytosol	c16520		1437594	
+hdeACP	cis-hexadec-9-enoyl-[acyl-carrier protein] (n-C16:1)	C27H49N2O8PRS	-1	Cytosol	C16520		1437594	
 rib-D	D-Ribose	C5H10O5	0	Extra-organism, Cytosol, Periplasm	C00121	50-69-1	33936	
 4abutn	4-Aminobutanal	C4H10NO	1	Cytosol	C00555		35337	
 btn	Biotin	C10H15N2O3S	-1	Cytosol	C00120	58-85-5	33931	
@@ -407,7 +409,7 @@ dad-2	Deoxyadenosine	C10H13N5O3	0	Extra-organism, Cytosol, Periplasm	C00559	958-
 ragund	rhamanosyl-N-acetylglucosamyl-undecaprenyl diphosphate	C69H113N1O16P2	-2	Cytosol			2377416	
 man	D-Mannose	C6H12O6	0	Extra-organism, Cytosol, Periplasm	C00159	3458-28-4	34085	
 dgsn	Deoxyguanosine	C10H13N5O4	0	Extra-organism, Cytosol, Periplasm	C00330	961-07-9	34637	
-6hmhpt	6-hydroxymethyl dihydropterin	C7H9N5O2	0	Cytosol			1447073	
+6hmhpt	6-hydroxymethyl dihydropterin	C7H9N5O2	0	Cytosol	C01300		1447073
 uamr	UDP-N-acetylmuramate	C20H28N3O19P2	-3	Cytosol	C01050		36702	
 nmn	NMN	C11H14N2O8P	-1	Extra-organism, Cytosol, Periplasm	C00455	1094-61-7	35022	
 mlthf	5,10-Methylenetetrahydrofolate	C20H21N7O6	-2	Cytosol	C00143		34022	
@@ -566,7 +568,7 @@ utp	UTP	C9H11N2O15P3	-4	Cytosol	C00075	63-39-8	33760
 5dglcn	5-Dehydro-D-gluconate	C6H9O7	-1	Extra-organism, Cytosol, Periplasm	C01062		36726	
 hisp	L-Histidinol phosphate	C6H11N3O4P	-1	Cytosol	C01100	25679-93-0	36807	
 grxox	glutaredoxin (oxidized)	X	0	Cytosol	C07293		2388475	
-ttdcea	tetradecenoate (n-C14:1)	C14H25O2	-1	Extra-organism, Cytosol, Periplasm	c08322		1451010	
+ttdcea	tetradecenoate (n-C14:1)	C14H25O2	-1	Extra-organism, Cytosol, Periplasm	C08322		1451010	
 kdo2lipid4	KDO(2)-lipid IV(A)	C84H148N2O37P2	-6	Extra-organism, Cytosol, Periplasm	C06025		1450113	
 ppa	Propionate (n-C3:0)	C3H5O2	-1	Extra-organism, Cytosol, Periplasm	C00163	79-09-4	34098	
 dtbt	Dethiobiotin	C10H17N2O3	-1	Cytosol	C01909		38667	
@@ -618,7 +620,7 @@ tddec2eACP	trans-Dodec-2-enoyl-[acyl-carrier protein]	C23H41N2O8PRS	-1	Cytosol	C
 lipa_cold	cold adapted KDO(2)-lipid (A)	C114H202N2O39P2	-6	Extra-organism, Cytosol, Periplasm			1485766	
 3hdecACP	(R)-3-Hydroxydecanoyl-[acyl-carrier protein]	C21H39N2O9PRS	-1	Cytosol	C04619	320-77-4	44184	
 cenchddd	cis-3-(3-carboxyethenyl)-3,5-cyclohexadiene-1,2-diol	C9H9O4	-1	Cytosol	C12622		1472194	
-1odec11eg3p	1-octadec-11-enoyl-sn-glycerol 3-phosphate	C21H39O7P1	-2	Cytosol, Periplasm	c00681		2617407	
+1odec11eg3p	1-octadec-11-enoyl-sn-glycerol 3-phosphate	C21H39O7P1	-2	Cytosol, Periplasm	C00681		2617407	
 2tdec7eg3p	2-tetradec-7-enoyl-sn-glycerol 3-phosphate	C17H32O7P1	-1	Cytosol, Periplasm	C03974		2706879	
 mmcoa-R	(R)-Methylmalonyl-CoA	C25H35N7O19P3S	-5	Cytosol	C01213		37090	
 pg141	Phosphatidylglycerol (ditetradec-7-enoyl, n-C14:1)	C34H62O10P1	-1	Cytosol, Periplasm	C00344		2617848	
@@ -700,7 +702,7 @@ aspsa	L-Aspartate 4-semialdehyde	C4H7NO3	0	Cytosol	C00441	None	34990
 12ppd-R	(R)-Propane-1,2-diol	C3H8O2	0	Extra-organism, Cytosol, Periplasm	C02912	4254-14-2	40801	
 orot5p	Orotidine 5'-phosphate	C10H10N2O11P	-3	Cytosol	C01103	2149-82-8	36813	
 3mob	3-Methyl-2-oxobutanoate	C5H7O3	-1	Cytosol	C00141		34011	
-6hmhptpp	6-hydroxymethyl-dihydropterin pyrophosphate	C7H8N5O8P2	-3	Cytosol			1447078	
+6hmhptpp	6-hydroxymethyl-dihydropterin pyrophosphate	C7H8N5O8P2	-3	Cytosol	C04807		1447078
 xtsn	Xanthosine	C10H12N4O6	0	Extra-organism, Cytosol, Periplasm	C01762	146-80-5	38352	
 glx	Glyoxylate	C2H1O3	-1	Cytosol	C00048	298-12-4	33659	
 udpLa4fn	uridine 5''-diphospho-{beta}-4-deoxy-4-formamido-L-arabinose	C15H21N3O16P2	-2	Cytosol	C16154		2374694	
@@ -784,7 +786,7 @@ gmhep17bp	D-Glycero-D-manno-heptose 1,7-bisphosphate	C7H12O13P2	-4	Cytosol	C1147
 sarcs	Sarcosine	C3H7NO2	0	Cytosol	C00213	107-97-1	34275	
 crnDcoa	D-carnitinyl-CoA	C28H46N8O18P3S	-3	Cytosol			2386261	
 skm	Shikimate	C7H9O5	-1	Extra-organism, Cytosol, Periplasm	C00493	138-59-0	35144	
-cu	Cu+	Cu	1	Extra-organism, Cytosol, Periplasm	c00070		2323762	
+cu	Cu+	Cu	1	Extra-organism, Cytosol, Periplasm	C00070		2323762	
 bbtcoa	gamma-butyrobetainyl-CoA	C28H46N8O17P3S	-3	Cytosol			1489417	
 g3pg	Glycerophosphoglycerol	C6H14O8P	-1	Extra-organism, Cytosol, Periplasm	C03274	11034-93-8	41538	
 3dhguln	3-Dehydro-L-gulonate	C6H9O7	-1	Cytosol	C00618		35509	
@@ -800,7 +802,7 @@ gmhep7p	D-Glycero-D-manno-heptose 7-phosphate	C7H13O10P	-2	Cytosol	C07836		14880
 adprib	ADPribose	C15H21N5O14P2	-2	Cytosol	C00301		34547	
 8aonn	8-Amino-7-oxononanoate	C9H17NO3	0	Cytosol	C01092		36792	
 pa161	1,2-dihexadec-9-enoyl-sn-glycerol 3-phosphate	C35H63O8P1	-2	Cytosol, Periplasm	C00416		2617433	
-tdecoa	Tetradecenoyl-CoA (n-C14:1CoA)	C35H56N7O17P3S	-4	Cytosol	c06737		1451382	
+tdecoa	Tetradecenoyl-CoA (n-C14:1CoA)	C35H56N7O17P3S	-4	Cytosol	C06737		1451382	
 gdpfuc	GDP-L-fucose	C16H23N5O15P2	-2	Cytosol	C00325		34623	
 gtp	GTP	C10H12N5O14P3	-4	Extra-organism, Cytosol, Periplasm	C00044	86-01-1	33641	
 udpgalfur	UDP-D-galacto-1,4-furanose	C15H22N2O17P2	-2	Cytosol	C03733	638-23-3	42414	
