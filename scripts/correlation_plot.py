@@ -39,7 +39,7 @@ ax.set_xlabel(r'in vitro $k_{\mathrm{cat}}$ $\left[s^{-1}\right]$', size=20)
 ax.tick_params(axis='both', which='both', top='off', right='off')
 
 plt.tight_layout()
-plt.savefig('res/kcat_rmax_correlation.pdf')
+plt.savefig('../res/kcat_rmax_correlation.pdf')
 
 
 ''' find conditions with rmax values '''
@@ -66,4 +66,4 @@ ax2.set_ylabel('number of enzymes', color='#FFB84D', size=15)
 ax.tick_params(axis='both', which='both', top='off', right='off', bottom='off')
 ax.set_xlim([-0.5,len(bars)*2])
 plt.tight_layout()
-plt.savefig('res/best_conditions.pdf')
+plt.savefig('../res/best_conditions.pdf')

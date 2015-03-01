@@ -26,7 +26,7 @@ rcat = mm.calculate_enzyme_rates()
 rmax = mm.get_rcat_max(7)
 cmax = mm.get_cond_max(7)
 
-relevant_reac = set(rmax.index & kcat.index)
+relevant_reac = set(rmax.index & kcat.index & KMs.index)
 
 i = 0
 

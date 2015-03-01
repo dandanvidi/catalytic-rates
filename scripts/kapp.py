@@ -66,7 +66,8 @@ class MODEL(object):
             sparse[r.id] = r_dict
             assert r not in reaction_strings, 'Duplicate reaction!'
             kegg_reaction = KeggReaction(r_dict)
-            kegg_reaction.remove_protons()
+            print kegg_reaction
+#            kegg_reaction.remove_protons()
             reaction_strings[r.id] = str(kegg_reaction)
 
         return reaction_strings, sparse
@@ -392,7 +393,7 @@ class MM_KINETICS(RCAT):
 
     def __init__(self, model):
         RCAT.__init__(self, model)    
-        self.CC_CACHE_FNAME = os.path.expanduser('../component-contribution/cache/component_contribution.mat')
+        self.CC_CACHE_FNAME = os.path.expanduser('../../component-contribution/cache/component_contribution.mat')
 
         self.reactions = [r.id for r in self.model.reactions]
         self.metab_conc = pd.read_csv('../data/metab_conc.csv') 
@@ -448,14 +449,14 @@ class MM_KINETICS(RCAT):
             for ID, cid  in self.known_cids.iteritems(): # set the conc of known metabolites
                 if ID in Kmodel.cids:
                     i = Kmodel.cids.index(ID)
-                    c = self.metabolites_concentration[condition][cid]
+                    c = self.metab_conc[condition][cid]
                     if not np.isnan(c):
                         conc[0, i] = c
                 
             dGc_prime = dG0_prime + R * default_T * np.dot(np.log(conc), Kmodel.S).T
             r_to_dGc[condition] = dGc_prime
 
-        r_to_dGc['std'] = dG0_std
+#        r_to_dGc['std'] = dG0_std
         r_to_dGc.to_csv('../cache/reactions_to_dGc.csv')
 
     def backwards_reaction_effect(self):
@@ -570,7 +571,10 @@ if __name__ == "__main__":
 
     model_fname = "../data/iJO1366_curated.xml"
     model = create_cobra_model_from_sbml_file(model_fname)
-    rate = RCAT(model)
+    mm = MM_KINETICS(model)
+    
+    mm.reaction_formula(map(lambda x: x.id, model.reactions))
 
+#    mm.cache_reactions_dG()
 
     
