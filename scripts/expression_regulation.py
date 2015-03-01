@@ -1,11 +1,14 @@
-from kapp import PLOT_DATA
+from kapp import *
+import sys, os
+#sys.path.append(os.path.expanduser('~/git/component-contribution'))
+sys.path.append(os.path.expanduser('~/git/cobrapy'))
 from cobra.io.sbml import create_cobra_model_from_sbml_file
 from cobra.manipulation.modify import convert_to_irreversible
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-model_fname = "data/iJO1366_curated.xml"
+model_fname = "../data/iJO1366_curated.xml"
 model = create_cobra_model_from_sbml_file(model_fname)
 
 rc = PLOT_DATA(model)
@@ -49,7 +52,7 @@ for c in index:
     if c == 'Chemostat_vilu_011:Chemostat_vilu_049':
         x2, y2 = E2_to_E1, v2_to_v1 
         
-fig, (ax1, ax2) = plt.subplots(2,1, sharex=True, sharey=True, figsize=(4,8))
+fig, (ax1, ax2) = plt.subplots(2,1, sharex=True, sharey=True, figsize=(4,5))
 #ax1 = fig.add_subplot(211, axis_bgcolor=(0.95,0.92,0.90))
 #ax2 = fig.add_subplot(212, axis_bgcolor=(0.95,0.92,0.90))
 
@@ -72,4 +75,4 @@ ax2.tick_params(axis='both', which='both', top='off', bottom='on',
 ax2.set_xlabel(r'fold change $\left[\frac{E_n}{E_m}\right]$', size=15)
 plt.tight_layout()
 
-plt.savefig('res/expression_regulation.pdf')
+plt.savefig('../res/expression_regulation.pdf')

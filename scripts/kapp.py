@@ -30,12 +30,12 @@ class MODEL(object):
         """
         self.model = deepcopy(model)
         self.gene_names = {row[0:5]:row[84:].split(';')[0].strip() 
-                            for row in open("data/all_ecoli_genes.txt", 'r')}
+                            for row in open("../data/all_ecoli_genes.txt", 'r')}
         
     def model_metabolites(self):
         
         '''map model metabolites to kegg CIDs'''
-        metabolites = pd.read_csv("data/metaboliteList.txt", delimiter='\t')
+        metabolites = pd.read_csv("../data/metaboliteList.txt", delimiter='\t')
         metabolites.pop('cas_id')
         metabolites.pop('Unnamed: 8')
         metabolites.set_index('name', inplace=True)
@@ -152,13 +152,13 @@ class RCAT(MODEL):
     def __init__(self, model):
         MODEL.__init__(self, model)
 
-        self.growth_conditions = pd.DataFrame.from_csv("data/growth_conditions.csv")
+        self.growth_conditions = pd.DataFrame.from_csv("../data/growth_conditions.csv")
         self.growth_conditions.sort(axis=0, columns='growth_rate_1_h', inplace=True)
 
         self.growth_conditions.drop('anaerobic_heinmann', axis=0, inplace=True)
         
-        self.V_data = pd.DataFrame.from_csv('cache/fluxes_[molecules_per_second_per_gCDW].csv')        
-        self.E_data = pd.DataFrame.from_csv("cache/expression_[copies_per_gCDW].csv")
+        self.V_data = pd.DataFrame.from_csv('../cache/fluxes_[molecules_per_second_per_gCDW].csv')        
+        self.E_data = pd.DataFrame.from_csv("../cache/expression_[copies_per_gCDW].csv")
         
         columns = ['bnumber', 'gene_name'] + list(self.growth_conditions.index)
         
@@ -282,7 +282,7 @@ class RCAT(MODEL):
     def get_kcat_of_model_reactions(self):
         
         # kcat values collected from BRENDA and other publications - manually curated
-        kcats = pd.read_csv("data/manual_kcat_values.csv")
+        kcats = pd.read_csv("../data/manual_kcat_values.csv")
         kcats.set_index('reactions', inplace=True)
 
         return kcats['kcat per subunit']        
@@ -395,7 +395,7 @@ class MM_KINETICS(RCAT):
         self.CC_CACHE_FNAME = os.path.expanduser('../component-contribution/cache/component_contribution.mat')
 
         self.reactions = [r.id for r in self.model.reactions]
-        self.metab_conc = pd.read_csv('data/metab_conc.csv') 
+        self.metab_conc = pd.read_csv('../data/metab_conc.csv') 
         self.metab_conc.set_index('Compound Id (KEGG)', inplace=True)
         self.metab_conc.dropna(how='all', inplace=True)
         
@@ -456,11 +456,11 @@ class MM_KINETICS(RCAT):
             r_to_dGc[condition] = dGc_prime
 
         r_to_dGc['std'] = dG0_std
-        r_to_dGc.to_csv('cache/reactions_to_dGc.csv')
+        r_to_dGc.to_csv('../cache/reactions_to_dGc.csv')
 
     def backwards_reaction_effect(self):
 
-        dG = pd.DataFrame.from_csv('cache/reactions_to_dGc.csv')
+        dG = pd.DataFrame.from_csv('../cache/reactions_to_dGc.csv')
         dG = dG[['glc','glyc','ac']]
         T = 1-np.exp(dG/(R*default_T))
         T.replace([np.inf, -np.inf], np.nan, inplace=True)
@@ -568,7 +568,7 @@ class PLOT_DATA(RCAT):
 
 if __name__ == "__main__":
 
-    model_fname = "data/iJO1366_curated.xml"
+    model_fname = "../data/iJO1366_curated.xml"
     model = create_cobra_model_from_sbml_file(model_fname)
     rate = RCAT(model)
 

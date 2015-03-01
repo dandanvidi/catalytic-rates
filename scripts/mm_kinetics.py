@@ -9,28 +9,18 @@ import numpy as np
 import csv 
 import ast
 from scipy.stats.mstats import gmean
+import re
+
 #import matplotlib.gridspec as gridspec
 #plt.rcParams['text.usetex']=True
 #plt.rcParams['text.latex.unicode']=True
 
-model_fname = "data/iJO1366_curated.xml"
+model_fname = "../data/iJO1366_curated.xml"
 model = create_cobra_model_from_sbml_file(model_fname)
 convert_to_irreversible(model)
-reactions = set([r.id for r in model.reactions])
-metabolites = set([m.name for m in model.metabolites])
-kms = csv.reader(open("data/temp_KM.csv",'r'), delimiter='\t')
-kms.next()
-data = pd.DataFrame(columns=metabolites, index=reactions)
-for i, row in enumerate(kms):
-    r, s , p = row[0], row[1], row[2]
-    s = ast.literal_eval(s)
-    for m, ks in s.iteritems():
-        if ks != []:
-            m = m.replace("*", "'")
-            data.loc[r,m] = gmean(np.array(ks))
-
 mm = MM_KINETICS(model)
 
+KMs = pd.DataFrame.from_csv('../cache/KM_values.csv').dropna(how='all')
 kcat = mm.get_kcat_of_model_reactions()
 rcat = mm.calculate_enzyme_rates()
 rmax = mm.get_rcat_max(7)
@@ -69,7 +59,7 @@ for r in model.reactions:
     if r.id in relevant_reac:
         stoicho = {k.name:-v for k,v in r.metabolites.iteritems() 
                                         if v<0 and k.name not in ['H2O', 'H+']}
-        kms = data.loc[r.id].dropna()
+        kms = KMs.loc[r.id].dropna()
         condition = carbon_cond[r.id]
         if condition in ['glc', 'ac', 'glyc']:
             if len(kms) == len(stoicho):
@@ -151,4 +141,4 @@ ax3.set_yscale('log')
 
 plt.tight_layout()
 
-plt.savefig('res/saturation_and_thermodynamics.pdf')
+plt.savefig('../res/saturation_and_thermodynamics.pdf')

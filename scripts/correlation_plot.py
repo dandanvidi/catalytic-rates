@@ -7,7 +7,7 @@ from cobra.manipulation.modify import convert_to_irreversible
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
-model_fname = "data/iJO1366_curated.xml"
+model_fname = "../data/iJO1366_curated.xml"
 model = create_cobra_model_from_sbml_file(model_fname)
 
 R = RCAT(model)
