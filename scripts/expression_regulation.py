@@ -52,27 +52,35 @@ for c in index:
     if c == 'Chemostat_vilu_011:Chemostat_vilu_049':
         x2, y2 = E2_to_E1, v2_to_v1 
         
-fig, (ax1, ax2) = plt.subplots(2,1, sharex=True, sharey=True, figsize=(4,5))
-#ax1 = fig.add_subplot(211, axis_bgcolor=(0.95,0.92,0.90))
-#ax2 = fig.add_subplot(212, axis_bgcolor=(0.95,0.92,0.90))
-
+fig1 = plt.figure(figsize=(6,3))
+ax1 = plt.axes(axisbg='#FFE6C0')
 rc.expression_plot(x1, y1, ax1)
-rc.expression_plot(x2, y2, ax2)
-
-
-ax1.set_title(r'acetate $\longrightarrow $ glucose', weight='book', color='b')
-ax2.set_title(r'glucose limited chemostats', weight='book', color='b')
-
+ax1.set_title(r'acetate $\longrightarrow $ glucose', weight='book', color='b', size=15)
+ax1.set_xlabel(r'fold change $\left[\frac{E[{C_1}]}{E[{C_2}]}\right]$', size=15)
 ax1.set_ylabel('reactions', size=15)   
-ax2.set_ylabel('reactions', size=15)   
-
+ax1.annotate(r'$\frac{\mu[{C_2}]}{\mu[{C_1}]} \approx \frac{v[{C_1}]}{v[{C_2}]}$', xy=(y1.mean(), 52),  xycoords='data',
+            xytext=(y1.mean()+2.8, 48),
+            horizontalalignment='right', verticalalignment='center',size=20
+            )
 ax1.tick_params(axis='both', which='both', top='off', bottom='on',
                                           left='on', right='off')
-
-ax2.tick_params(axis='both', which='both', top='off', bottom='on',
-                                          left='off', right='off')
-#ax2.set_yticks([])
-ax2.set_xlabel(r'fold change $\left[\frac{E_n}{E_m}\right]$', size=15)
+ax1.set_ylim(0,60)
 plt.tight_layout()
+plt.savefig('../res/expression_regulation_acetate_to_glucose.pdf')
 
-plt.savefig('../res/expression_regulation.pdf')
+
+fig2 = plt.figure(figsize=(6,3))
+ax2 = plt.axes(axisbg='#FFE6C0')
+rc.expression_plot(x2, y2, ax2)
+ax2.set_title(r'glucose limited chemosat', weight='book', color='b', size=15)
+ax2.set_xlabel(r'fold change $\left[\frac{E[{C_1}]}{E[{C_2}]}\right]$', size=15)
+ax2.set_ylabel('reactions', size=15)   
+ax2.annotate(r'$\frac{\mu[{C_2}]}{\mu[{C_1}]} \approx \frac{v[{C_2}]}{v[{C_1}]}$', xy=(y2.mean(), 52),  xycoords='data',
+            xytext=(y2.mean()+0.05, 48),
+            horizontalalignment='left', verticalalignment='center',size=20
+            )
+ax2.tick_params(axis='both', which='both', top='off', bottom='on',
+                                          left='on', right='off')
+ax2.set_ylim(0,60)
+plt.tight_layout()
+plt.savefig('../res/expression_regulation_chemostat.pdf')
