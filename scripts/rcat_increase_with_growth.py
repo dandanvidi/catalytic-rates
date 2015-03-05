@@ -14,7 +14,7 @@ def boot_strap(x):
         median_values[i] = np.median(new_x)
     return np.std(median_values)
 
-model_fname = "data/iJO1366_curated.xml"
+model_fname = "../data/iJO1366_curated.xml"
 model = create_cobra_model_from_sbml_file(model_fname)
 
 rc = RCAT(model)
@@ -53,7 +53,7 @@ ax.set_xlim(0,0.7)
 ax.set_ylim(0,1)
 
 plt.tight_layout()
-plt.savefig('res/catalytic_efficacy.pdf')
+plt.savefig('../res/catalytic_efficacy.pdf')
 
 '''rcat increase scatter plot'''
 fig = plt.figure(figsize=(7,4.5))
@@ -85,4 +85,4 @@ ax.set_xlim(0,0.7)
 #ax.set_ylim(0,1)
 
 plt.tight_layout()
-plt.savefig('res/rcat_increases_with_growth.pdf')
+plt.savefig('../res/rcat_increases_with_growth.pdf')
