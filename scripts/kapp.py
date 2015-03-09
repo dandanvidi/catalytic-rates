@@ -62,11 +62,14 @@ class MODEL(object):
                             if m.name in CIDS.index}
             if len(r_dict) != len(r.metabolites):
                 continue
-            
+
+            if 'C00080' in r_dict:
+                del r_dict['C00080']            
             sparse[r.id] = r_dict
             assert r not in reaction_strings, 'Duplicate reaction!'
             kegg_reaction = KeggReaction(r_dict)
-            print kegg_reaction
+#            print kegg_reaction
+
 #            kegg_reaction.remove_protons()
             reaction_strings[r.id] = str(kegg_reaction)
 
@@ -424,6 +427,7 @@ class MM_KINETICS(RCAT):
         else:
             cc = ComponentContribution.from_matfile(self.CC_CACHE_FNAME)    
         
+        convert_to_irreversible(self.model)   
         model_reactions = [r.id for r in self.model.reactions]
         reaction_strings, sparse = self.reaction_formula(model_reactions)
 
@@ -456,6 +460,7 @@ class MM_KINETICS(RCAT):
             dGc_prime = dG0_prime + R * default_T * np.dot(np.log(conc), Kmodel.S).T
             r_to_dGc[condition] = dGc_prime
 
+#        print len(dG0_std)
 #        r_to_dGc['std'] = dG0_std
         r_to_dGc.to_csv('../cache/reactions_to_dGc.csv')
 
@@ -573,8 +578,8 @@ if __name__ == "__main__":
     model = create_cobra_model_from_sbml_file(model_fname)
     mm = MM_KINETICS(model)
     
-    mm.reaction_formula(map(lambda x: x.id, model.reactions))
+#    mm.reaction_formula(map(lambda x: x.id, model.reactions))
 
-#    mm.cache_reactions_dG()
+    mm.cache_reactions_dG()
 
     

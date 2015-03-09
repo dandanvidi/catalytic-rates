@@ -20,7 +20,7 @@ model = create_cobra_model_from_sbml_file(model_fname)
 convert_to_irreversible(model)
 mm = MM_KINETICS(model)
 
-KMs = pd.DataFrame.from_csv('../cache/KM_values.csv').dropna(how='all')
+KMs = pd.DataFrame.from_csv('../cache/KM_values.csv')
 kcat = mm.get_kcat_of_model_reactions()
 rcat = mm.calculate_enzyme_rates()
 rmax = mm.get_rcat_max(7)
@@ -60,6 +60,7 @@ for r in model.reactions:
         stoicho = {k.name:-v for k,v in r.metabolites.iteritems() 
                                         if v<0 and k.name not in ['H2O', 'H+']}
         kms = KMs.loc[r.id].dropna()
+        kms = kms[kms<0]*-1
         condition = carbon_cond[r.id]
         if condition in ['glc', 'ac', 'glyc']:
             if len(kms) == len(stoicho):
@@ -85,6 +86,7 @@ ax3.set_axis_bgcolor((0.95,0.92,0.90))
 ax1.scatter(S, (rmax/kcat)[temp], s=50, alpha=0.4, edgecolor='none')            
 ax1.set_xlim(1/1000.0, 3)
 ax1.set_ylim(1/1000.0, 30)
+ax1.axhline(1, 1e-3,3, ls=':', lw=3, color='r')
 ax1.axvline(1, 0, 1e3, ls=':', lw=3, color='r')
 ax1.set_ylabel(r'$r_{\rm{cat}}^{\rm{max}}$ / $k_{\rm{cat}}$', size=20)
 ax1.set_xlabel('$ S $', size=20)
@@ -94,6 +96,7 @@ ax1.plot(np.logspace(-3,0), np.logspace(-3,0), 'k:')
 ax2.scatter(T, (rmax/kcat)[temp], s=50, color='y', alpha=0.4, edgecolor='none')            
 ax2.set_xlim(1/1000.0, 3)
 ax2.set_ylim(1/1000.0, 30)
+ax2.axhline(1, 1e-3,3, ls=':', lw=3, color='r')
 ax2.axvline(1, 0, 1e3, ls=':', lw=3, color='r')
 ax2.set_xlabel('$ T $', size=20)
 ax2.tick_params(axis='both', which='both', top='off', right='off')
@@ -102,22 +105,23 @@ ax2.plot(np.logspace(-3,0), np.logspace(-3,0), 'k:')
 ax3.scatter(ST, (rmax/kcat)[ST.index], s=50, color='#00A352', alpha=0.4, edgecolor='none')            
 ax3.set_xlim(1/1000.0, 3)
 ax3.set_ylim(1/1000.0, 30)
+ax3.axhline(1, 1e-3,3, ls=':', lw=3, color='r')
 ax3.axvline(1, 0, 1e3, ls=':', lw=3, color='r')
 ax3.set_xlabel(r'$ S $  x  $ T $', size=20)
 ax3.tick_params(axis='both', which='both', top='off', right='off')
 ax3.plot(np.logspace(-3,0), np.logspace(-3,0), 'k:')
 
-b_to_r = mm.map_model_reaction_to_genes()
+r_to_b = mm.map_model_reaction_to_genes()
 
 names = []
 for r in ST.index:
-    names.append(mm.gene_names[b_to_r[r]])
+    names.append(mm.gene_names[r_to_b[r]])
 
-labels = list(ST[ST<0.4].index) + ['PGI', 'PFK', 'AMAOTr', 'PTPATi']
+labels = list(ST[ST<0.4].index)  + ['PGI', 'PFK', 'AMAOTr', 'PTPATi']
 
 for l in labels:
     if ST[l]:
-        name = mm.gene_names[b_to_r[l]]
+        name = mm.gene_names[r_to_b[l]]
         if name == 'gltX':
             print name
         ax3.text(ST[l], (rmax/kcat)[l] , name,
