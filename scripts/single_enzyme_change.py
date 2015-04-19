@@ -6,7 +6,7 @@ from pandas.stats.api import ols
 import numpy as np
 import sys, os
 import matplotlib.pyplot as plt
-sys.path.append(os.path.expanduser('~/git/global_functions'))
+sys.path.append(os.path.expanduser('~/git/across_projects'))
 from color import ColorMap
 from scipy.stats import pearsonr
 

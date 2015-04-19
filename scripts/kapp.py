@@ -97,7 +97,7 @@ class MODEL(object):
                 
         r_to_ec = {r.id:v for r,v in r_to_ec.iteritems()}    
         r_to_ec = pd.DataFrame(r_to_ec.items()).set_index(0)
-        r_to_ec.to_csv("cache/reactions_to_ec_mapping.csv")
+        r_to_ec.to_csv("../cache/reactions_to_ec_mapping.csv")
         
         return 
        
@@ -111,8 +111,11 @@ class MODEL(object):
         r_to_single_gene = pd.Series()
 
         # remove reactions which can be catalysed by more than one gene
+        enzymatic_reactions = 0
         for r in self.model.reactions:
             genes = map(lambda x: x.id, r.genes)
+            if len(genes) > 0:
+                enzymatic_reactions += 1
             if len(genes) == 1 and genes[0]:
                 r_to_single_gene[r.id] = genes[0]
         
@@ -404,7 +407,7 @@ class MM_KINETICS(RCAT):
         self.metab_conc.dropna(how='all', inplace=True)
         
         self.known_cids = {'C'+'%05i'%c:c for c in self.metab_conc.index}
-
+        self.KMs = pd.DataFrame.from_csv('../cache/KM_values.csv')
 
     def get_reactions_metabolites(self):
         self.r_to_metab = pd.DataFrame(columns=['substrates', 'products'],
@@ -464,7 +467,7 @@ class MM_KINETICS(RCAT):
 #        r_to_dGc['std'] = dG0_std
         r_to_dGc.to_csv('../cache/reactions_to_dGc.csv')
 
-    def backwards_reaction_effect(self):
+    def _backwards_reaction_effect(self):
 
         dG = pd.DataFrame.from_csv('../cache/reactions_to_dGc.csv')
         dG = dG[['glc','glyc','ac']]
@@ -473,6 +476,55 @@ class MM_KINETICS(RCAT):
 
         return dG, T
         
+    def _calculate_saturation_effect(self, kms, stoicho, condition):
+        
+        metabolites = kms.index
+        smul = 1
+        for m in metabolites:
+            cid = int(self.model_metabolites()['kegg_id'][m][1:])
+    #        conc = 100 # uM
+            if cid in self.metab_conc[condition].dropna():
+                conc = self.metab_conc[condition][cid]*1000 
+                s = (conc / kms[m])**stoicho[m]
+                smul *= s
+                return (smul) / (1 + smul)
+
+
+    def concentraion_dependant_effects(self):
+        kcat = self.get_kcat_of_model_reactions()
+        rmax = self.get_rcat_max(7)   
+        relevant_reac = set(rmax.index & kcat.index & self.KMs.index)
+        cmax = self.get_cond_max(7)
+        convert_to_irreversible(self.model)
+        carbon_cond = {r:self.growth_conditions['carbon'][cmax[r]] for r in cmax.index}
+        dG, thermo = self._backwards_reaction_effect()
+        
+        S = pd.Series()
+        T = pd.Series()
+        for r in self.model.reactions:
+            if r.id in relevant_reac:
+                stoicho = {k.name:-v for k,v in r.metabolites.iteritems() 
+                                                if v<0 and k.name not in ['H2O', 'H+']}
+                kms = self.KMs.loc[r.id].dropna()
+                kms = kms[kms<0]*-1
+                condition = carbon_cond[r.id]
+                if condition in ['glc', 'ac', 'glyc']:
+                    if len(kms) == len(stoicho):
+                        S[r.id] = self._calculate_saturation_effect(kms, stoicho, condition)
+                    if r.id in thermo.index:
+                        T[r.id] = thermo.loc[r.id, condition]        
+        
+        T = np.abs(T[T>-0.1])
+        S.dropna(inplace=True)
+        S = S.astype('float')
+        
+        intersect = T.index & S.index
+        S = S[intersect]
+        T = T[T>0][intersect]
+        ST = (S*T).dropna()
+        
+        return S, T, ST
+        
 class PLOT_DATA(RCAT):
 
     def __init__(self, model):
@@ -480,11 +532,11 @@ class PLOT_DATA(RCAT):
 
     def expression_plot(self, e_change, v_change, ax, legend=False):
     
-        ax.hist(e_change.dropna(), label=r'$\frac{E_n}{E_m}$', 
+        ax.hist(e_change.dropna(), bins=np.arange(-3, 4.01, 0.5), zorder=9, label=r'$\frac{E_n}{E_m}$', 
                 facecolor=(1.0,0.6,0.6), edgecolor=(0.5, 0.3, 0.3), histtype='stepfilled')
-        ax.axvline(e_change.median(), 0, 1, c=(0.6, 0, 0), ls=':', 
+        ax.axvline(e_change.median(), 0, 1, c=(0.6, 0, 0), zorder=10, ls=':', 
                    lw=3, label=r'$\frac{E_n}{E_m}$ $\rm{median}$')
-        ax.axvline(v_change.median(), 0, 1, lw=3, c='k', ls='-', 
+        ax.axvline(v_change.median(), 0, 1, zorder=10, lw=3, c='k', ls='-', 
                    label=r'$\frac{v_n}{v_m}$ $\rm{median}$')
         
         if legend:
@@ -499,23 +551,19 @@ class PLOT_DATA(RCAT):
 
 
     def plot_kcat_rcat_correlation(self, x, y, fig, ax, color='b', edge='none', 
-                                   yerr='none', labels=[]):
+                                   yerr='none', labels=[], fit_on=True):
     
         logx = np.log10(x)
         logy = np.log10(y)
         
-        newx = logx
-        newx = np.append(newx, 4.0)
-        newx = np.append(-4.0, newx)
-        
-        ax.scatter(x, y,s=55, c=color, marker='o', edgecolor=edge, alpha=0.75)
+        ax.scatter(x, y,s=40, c=color, alpha=0.7, marker='o', edgecolor=edge, zorder=3)
         
         if yerr != 'none':
             ax.errorbar(x, y, 
                         yerr=yerr, barsabove=False, 
                         fmt=None, ecolor='k', alpha=0.4)
                     
-        ax.plot([1e-4, 1e4], [1e-4,1e4], 'k', ls='--')
+        ax.plot([1e-4, 1e4], [1e-4,1e4], '#333676', ls='-', lw=2, zorder=5)
          
         #Define function for scipy.odr
         fit_func = lambda B,x: B[0]*x + B[1]
@@ -526,10 +574,13 @@ class PLOT_DATA(RCAT):
         Odr = odr.ODR(Data, Model, beta0=[1,1])
         output = Odr.run()
         #output.pprint()
-        beta = output.beta
-        ax.plot(10**newx, 10**fit_func(beta, newx), color='#FF0000')
-                
+        beta = output.beta                
     
+        if fit_on:  
+            edge = np.array([-4, 4])
+            ax.plot([1e-4, 1e4], 10**fit_func(beta, edge), color='#699A33', ls=':', lw=3, zorder=1)
+            
+            
         ax.set_xscale('log')
         ax.set_yscale('log')
         
@@ -538,15 +589,17 @@ class PLOT_DATA(RCAT):
         if labels!=[]:
             ann = []
             for r in labels:
-                ann.append(ax.text(x[r], y[r], 
-                                   self.gene_names[b_to_r[r]], 
-                                    ha='center', va='center'))
-                
+                if x[r]>y[r]:
+                    ann.append(ax.text(x[r]*1.2, y[r], 
+                                       self.gene_names[b_to_r[r]], 
+                                        ha='left', va='center', zorder=5))
+                if x[r]<y[r]:
+                    ann.append(ax.text(x[r]/1.3, y[r], 
+                                       self.gene_names[b_to_r[r]], 
+                                        ha='right', va='center', zorder=5))
+                                        
             mask = np.zeros(fig.canvas.get_width_height(), bool)
-            
             fig.canvas.draw()
-            
-            
             for i, a in enumerate(ann):
                 bbox = a.get_window_extent()
                 x0 = int(bbox.x0)
@@ -559,15 +612,21 @@ class PLOT_DATA(RCAT):
                     a.set_visible(False)
                 else:
                     mask[s] = True
-    
-        
-        ax.text(x.TPI, y.TPI, self.gene_names[b_to_r['TPI']], 
-                               ha='center', va='center')
+                    
+        for tickx, ticky in zip(ax.xaxis.get_major_ticks(), ax.yaxis.get_major_ticks()):
+            tickx.label.set_fontsize(14) 
+            ticky.label.set_fontsize(14)
+            
         ax.set_xlim(1e-4,1e4)
         ax.set_ylim(1e-4,1e4)
+#        ax.set_xticklabels(ax.get_xticklabels(), size=30)
+#        ax.grid(color='b', alpha=0.5, ls='-', lw=1, zorder=0)
 
         cor, pval = stats.pearsonr(logx, logy)
+        rsq = cor**2
+        ax.text(1e-3/2, 1e3*2, r'$R^2=$%.2f' %rsq, size=15)        
         rmse = np.sqrt( output.sum_square / len(x) )
+        print "slope and intercept = " , beta
         print "r^2 = %.3f, pval = %.2e"%(cor**2, pval)
         print "rmse = %.3f" % rmse    
         return output
@@ -579,7 +638,7 @@ if __name__ == "__main__":
     mm = MM_KINETICS(model)
     
 #    mm.reaction_formula(map(lambda x: x.id, model.reactions))
-
-    mm.cache_reactions_dG()
+    o = mm.map_model_reactions_to_EC(model_fname)
+#    mm.cache_reactions_dG()
 
     

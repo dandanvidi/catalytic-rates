@@ -3,8 +3,8 @@ from cobra.io.sbml import create_cobra_model_from_sbml_file
 from cobra.manipulation.modify import convert_to_irreversible
 import sys, os
 sys.path.append(os.path.expanduser('~/git/global_functions'))
-from color import ColorMap
-from plot_types import cdf
+#from color import ColorMap
+#from plot_types import cdf
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -82,9 +82,9 @@ plt.savefig('../res/rcat_increase_with_gr.pdf')#
 #         va='bottom', size=15)
 #
 #ax.hlines(kcat.median(), 0, 0.7, lw=3, color='r', linestyles=':')
-#ax.text(.1, kcat.median()+0.01, 
-#         r'$k_{\mathrm{cat}}$', 
-#         va='bottom', size=15)
+ax.text(.1, kcat.median()+0.01, 
+         r'$k_{\mathrm{cat}}$', 
+         va='bottom', size=15)
 #
 #ax.set_xlabel(r'growth rate $\left[h^{-1}\right]$', size=15)
 #ax.set_ylabel('median catalytic rate $[s^{-1}]$', size=15)

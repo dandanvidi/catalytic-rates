@@ -1,19 +1,10 @@
-''' saturation and thermodynamics '''
-
-from kapp import MM_KINETICS
+from kapp import MM_KINETICS, PLOT_DATA
 from cobra.io.sbml import create_cobra_model_from_sbml_file
 from cobra.manipulation.modify import convert_to_irreversible
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import csv 
-import ast
-from scipy.stats.mstats import gmean
-import re
-
-#import matplotlib.gridspec as gridspec
-#plt.rcParams['text.usetex']=True
-#plt.rcParams['text.latex.unicode']=True
+from matplotlib.patches import ConnectionPatch
 
 model_fname = "../data/iJO1366_curated.xml"
 model = create_cobra_model_from_sbml_file(model_fname)
@@ -26,74 +17,26 @@ rcat = mm.calculate_enzyme_rates()
 rmax = mm.get_rcat_max(7)
 cmax = mm.get_cond_max(7)
 
-relevant_reac = set(rmax.index & kcat.index & KMs.index)
-
-i = 0
-
-concentrations = mm.metab_conc
-all_metabolites = mm.model_metabolites()
-
-def calculate_saturation_effect(kms, stoicho, condition):
-    
-    metabolites = kms.index
-    smul = 1
-    for m in metabolites:
-        cid = int(all_metabolites['kegg_id'][m][1:])
-#        conc = 100 # uM
-        if cid in concentrations[condition].dropna():
-            conc = concentrations[condition][cid]*1000 
-            s = (conc / kms[m])**stoicho[m]
-            smul *= s
-            return (smul) / (1 + smul)
-    
-
-
-carbon_cond = {r:mm.growth_conditions['carbon'][cmax[r]] for r in cmax.index}
-
-dG, thermo = mm.backwards_reaction_effect()
-
-S = pd.Series()
-T = pd.Series()
-i = 0
-for r in model.reactions:
-    if r.id in relevant_reac:
-        stoicho = {k.name:-v for k,v in r.metabolites.iteritems() 
-                                        if v<0 and k.name not in ['H2O', 'H+']}
-        kms = KMs.loc[r.id].dropna()
-        kms = kms[kms<0]*-1
-        condition = carbon_cond[r.id]
-        if condition in ['glc', 'ac', 'glyc']:
-            if len(kms) == len(stoicho):
-                S[r.id] = calculate_saturation_effect(kms, stoicho, condition)
-            if r.id in thermo.index:
-                T[r.id] = thermo.loc[r.id, condition]
-
-T = T[T>-0.1]
-T = np.abs(T)
-S.dropna(inplace=True)
-S = S.astype('float')
+S, T, ST = mm.concentraion_dependant_effects()
 
 temp = T.index & S.index
-S = S[temp]
-T = T[temp]
-ST = (S*T).dropna()
 
-fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(8,3.5))
-ax1.set_axis_bgcolor((0.95,0.92,0.90))
-ax2.set_axis_bgcolor((0.95,0.92,0.90))
-ax3.set_axis_bgcolor((0.95,0.92,0.90))
+fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(8,3.5), sharey=True)
+#ax1.set_axis_bgcolor((0.95,0.92,0.90))
+#ax2.set_axis_bgcolor((0.95,0.92,0.90))
+#ax3.set_axis_bgcolor((0.95,0.92,0.90))
 
-ax1.scatter(S, (rmax/kcat)[temp], s=50, alpha=0.4, edgecolor='none')            
+ax1.scatter(S, (rmax/kcat)[temp], s=50, alpha=0.4, edgecolor='0.5', zorder=3)            
 ax1.set_xlim(1/1000.0, 3)
 ax1.set_ylim(1/1000.0, 30)
 ax1.axhline(1, 1e-3,3, ls=':', lw=3, color='r')
 ax1.axvline(1, 0, 1e3, ls=':', lw=3, color='r')
-ax1.set_ylabel(r'$r_{\rm{cat}}^{\rm{max}}$ / $k_{\rm{cat}}$', size=20)
+ax1.set_ylabel(r'$r_{\rm{max}}$ / $k_{\rm{cat}}$', size=20)
 ax1.set_xlabel('$ S $', size=20)
 ax1.tick_params(axis='both', which='both', top='off', right='off')
 ax1.plot(np.logspace(-3,0), np.logspace(-3,0), 'k:')
 
-ax2.scatter(T, (rmax/kcat)[temp], s=50, color='y', alpha=0.4, edgecolor='none')            
+ax2.scatter(T, (rmax/kcat)[temp], s=50, color='#FFCC00', alpha=0.5, edgecolor='0.5', zorder=3)            
 ax2.set_xlim(1/1000.0, 3)
 ax2.set_ylim(1/1000.0, 30)
 ax2.axhline(1, 1e-3,3, ls=':', lw=3, color='r')
@@ -102,14 +45,14 @@ ax2.set_xlabel('$ T $', size=20)
 ax2.tick_params(axis='both', which='both', top='off', right='off')
 ax2.plot(np.logspace(-3,0), np.logspace(-3,0), 'k:')
 
-ax3.scatter(ST, (rmax/kcat)[ST.index], s=50, color='#00A352', alpha=0.4, edgecolor='none')            
+ax3.scatter(ST, (rmax/kcat)[ST.index], s=50, color='#00A352', alpha=0.4, edgecolor='0.5', zorder=3)            
 ax3.set_xlim(1/1000.0, 3)
 ax3.set_ylim(1/1000.0, 30)
-ax3.axhline(1, 1e-3,3, ls=':', lw=3, color='r')
-ax3.axvline(1, 0, 1e3, ls=':', lw=3, color='r')
+ax3.axhline(1, 1e-3,3, ls=':', lw=3, color='r', zorder=0)
+ax3.axvline(1, 0, 1e3, ls=':', lw=3, color='r', zorder=0)
 ax3.set_xlabel(r'$ S $  x  $ T $', size=20)
 ax3.tick_params(axis='both', which='both', top='off', right='off')
-ax3.plot(np.logspace(-3,0), np.logspace(-3,0), 'k:')
+ax3.plot(np.logspace(-3,0), np.logspace(-3,0), 'k:', zorder=0)
 
 r_to_b = mm.map_model_reaction_to_genes()
 
@@ -121,19 +64,41 @@ labels = list(ST[ST<0.4].index)  + ['PGI', 'PFK', 'AMAOTr', 'PTPATi']
 
 for l in labels:
     if ST[l]:
+        ax1.scatter(S[l], (rmax/kcat)[l], s=50, color='none',edgecolor='k', zorder=3)
+        ax2.scatter(T[l], (rmax/kcat)[l], s=50, color='none',edgecolor='k', zorder=3)
+        ax3.scatter(ST[l], (rmax/kcat)[l], s=50, color='none',edgecolor='k', zorder=3)
         name = mm.gene_names[r_to_b[l]]
-        if name == 'gltX':
-            print name
-        ax3.text(ST[l], (rmax/kcat)[l] , name,
-                 ha='center', va='center', size=12)
-        if S[l] < 0.4:
-            if name != 'glyA':
-                ax1.text(S[l], (rmax/kcat)[l] , name,
-                         ha='center', va='center', size=12)
-        if T[l] < 0.8:
-            ax2.text(T[l], (rmax/kcat)[l] , name,
-                     ha='center', va='center', size=12)
-                 
+        xy1 = (S[l], (rmax/kcat)[l])
+        xy2 = (T[l], (rmax/kcat)[l])
+        xy3 = (ST[l], (rmax/kcat)[l])
+        xy4 = (1, (rmax/kcat)[l])
+#        con = ConnectionPatch(xyA=xy2, xyB=xy1, 
+#                              coordsA="data", coordsB="data", 
+#                              axesA=ax2, axesB=ax1, 
+#                              color='0.5', alpha=0.5,
+#                              shrinkA=4.25, shrinkB=4.25, lw=0.5)
+#        ax2.add_artist(con)
+#        
+#        con = ConnectionPatch(xyA=xy3, xyB=xy2, 
+#                      coordsA="data", coordsB="data", 
+#                      axesA=ax3, axesB=ax2, 
+#                      color='0.5', alpha=0.5,
+#                      shrinkA=4.25, shrinkB=4.25, lw=0.5)
+#        ax3.add_artist(con)
+
+#        ax3.plot((ST[l]*1.25, 10), ((rmax/kcat)[l], (rmax/kcat)[l]), 
+#                 c='0.5', alpha=0.5, lw=0.5)
+        
+        if l not in ['AMAOTr', 'PTPATi']:
+            ax1.scatter(S[l], (rmax/kcat)[l], s=50, color='none',edgecolor='k', zorder=3)
+            ax2.scatter(T[l], (rmax/kcat)[l], s=50, color='none',edgecolor='k', zorder=3)
+            ax1.annotate(name, (S[l]/1.4, (rmax/kcat)[l]),
+                     ha='right', va='center', size=12)
+            ax2.annotate(name, (T[l]/1.4, (rmax/kcat)[l]),
+                     ha='right', va='center', size=12)
+        ax3.annotate(name, (ST[l]/1.4, (rmax/kcat)[l]),
+                 ha='right', va='center', size=12)
+
 ax1.set_xscale('log')
 ax1.set_yscale('log')
 
@@ -145,4 +110,9 @@ ax3.set_yscale('log')
 
 plt.tight_layout()
 
-plt.savefig('../res/saturation_and_thermodynamics.pdf')
+plt.savefig('../res/saturation_and_thermodynamics.svg')
+
+#
+#
+
+
