@@ -17,7 +17,7 @@ rmax = mm.get_rcat_max(7)
 
 
 flux = mm.V_data
-expression = mm.E_data.
+expression = mm.E_data
 kcats = set(kcat.index)
 rmaxs = set(kcat.index)
 

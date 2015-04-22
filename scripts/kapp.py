@@ -530,14 +530,14 @@ class PLOT_DATA(RCAT):
     def __init__(self, model):
         RCAT.__init__(self, model) 
 
-    def expression_plot(self, e_change, v_change, ax, legend=False):
+    def expression_plot(self, ax, e_change, v_change=0, legend=False):
     
         ax.hist(e_change.dropna(), bins=np.arange(-3, 4.01, 0.5), zorder=9, label=r'$\frac{E_n}{E_m}$', 
                 facecolor=(1.0,0.6,0.6), edgecolor=(0.5, 0.3, 0.3), histtype='stepfilled')
         ax.axvline(e_change.median(), 0, 1, c=(0.6, 0, 0), zorder=10, ls=':', 
                    lw=3, label=r'$\frac{E_n}{E_m}$ $\rm{median}$')
-        ax.axvline(v_change.median(), 0, 1, zorder=10, lw=3, c='k', ls='-', 
-                   label=r'$\frac{v_n}{v_m}$ $\rm{median}$')
+#        ax.axvline(v_change.median(), 0, 1, zorder=10, lw=3, c='k', ls='-', 
+#                   label=r'$\frac{v_n}{v_m}$ $\rm{median}$')
         
         if legend:
             ax.legend(fontsize=15, bbox_to_anchor=(0.175, 0.8))
