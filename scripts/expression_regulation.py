@@ -7,7 +7,8 @@ from cobra.manipulation.modify import convert_to_irreversible
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from itertools import combinations
+from itertools import combinations_with_replacement
+from matplotlib import cm
 
 model_fname = "../data/iJO1366_curated.xml"
 model = create_cobra_model_from_sbml_file(model_fname)
@@ -15,41 +16,75 @@ model = create_cobra_model_from_sbml_file(model_fname)
 rc = PLOT_DATA(model)
 
 reactions = rc.calculate_enzyme_rates().index
+gc = rc.growth_conditions.index
 gr = rc.growth_conditions.growth_rate_1_h
 V = rc.V_data.loc[reactions]
 E = rc.E_data.loc[reactions]
 
-for c in combinations(gc, 2):
-        
-    i, j = sorted(c, key=gr.to_dict().get)
+cmap = cm.get_cmap('Reds')
 
-    flux_change = V[j]/V[i]
-    expression_change = E[j]/E[i]
-        
-    relative_expression_change = expression_change / flux_change
+def draw_fold_change_hist(ax, array, color):
+    ax.hist(array, histtype='stepfilled', 
+            bins=np.arange(-1, np.max(array) + 0.1, 0.1),                                                         
+            color=color, edgecolor='none')
+    ax.axvline(array.median(), 0, 1, c='k', zorder=10, ls='-', lw=3)
+    ax.axvspan(array.median(), 1, alpha=0.3, color='#cdb79e', zorder=3)
+    ax.axvline(1, 0, 1, c='k', zorder=10, ls=':', lw=3)
     
-    if (i, j) == ('acetate_heinmann', 'glucose_heinmann'):    
-        x1 = relative_expression_change
-        x1 = x1.replace([np.inf, -np.inf], np.nan).dropna()
-    if (i, j) == ('Chemostat_vilu_011', 'Chemostat_vilu_049'):
-        x2 = relative_expression_change
-        x2 = x2.replace([np.inf, -np.inf], np.nan).dropna()
+    
+fig, (ax1, ax2) = plt.subplots(2,1, figsize=(4,5), sharex=True, sharey=True)
 
-fig, (ax1, ax2) = plt.subplots(2,1, figsize=(6,5), sharex=True, sharey=True)
-ax1.hist(x1, histtype='stepfilled', bins=np.arange(-1, np.max(x1) + 0.1, 0.1), 
-         color='#ff9c9f', edgecolor='none')
-ax1.axvline(x1.median(), 0, 1, c=(0.8, 0, 0), zorder=10, ls='-', lw=3)
-ax1.axvspan(0, 1, alpha=0.3, color='#cdb79e', zorder=3)
+pairwise_E_to_V = pd.DataFrame(index=['median_fold_change','gr_ratio'])
+E_to_V = pd.DataFrame(index=gc, columns=gc)
+for c in combinations_with_replacement(gc, 2):        
+    i, j = sorted(c, key=gr.to_dict().get)
+    flux_change = V[j]/V[i]
+    expression_change = E[j]/E[i]        
+    relative_expression_change = expression_change / flux_change
+    x = relative_expression_change
+    x = x.replace([np.inf, -np.inf], np.nan).dropna()
+    E_to_V[j][i] = x.median()
+    pairwise_E_to_V[c] = 1.
+    pairwise_E_to_V[c]['median_fold_change'] = x.median()
+    pairwise_E_to_V[c]['gr_ratio'] = gr[j]/gr[i]
+    if (i,j) == ('acetate_heinmann','glucose_heinmann'):
+        draw_fold_change_hist(ax1, x, cmap(x.median()))
+        print x.median()
+    elif (i,j) == ('Chemostat_vilu_011','Chemostat_vilu_049'):    
+        draw_fold_change_hist(ax2, x, cmap(x.median()))
+        print x.median()
 
-ax2.hist(x2, histtype='stepfilled', bins=np.arange(-1, np.max(x2) + 0.1, 0.1), 
-         color='#ffe07e', edgecolor='none')
-ax2.axvline(x2.median(), 0, 1, c=(0.6, 0.6, 0), zorder=10, ls='-', lw=3)
-ax2.axvspan(0, 1, alpha=0.3, color='#cdb79e', zorder=3)
-
-plt.xlim(-0.5,1.5)
+plt.xlim(0,1.5)
 plt.ylim(0,60)
 plt.ylabel('reactions', size=15)
 
+plt.savefig('../res/expression_regulation_hists.svg')
+
+plt.figure(figsize=(5,5))
+E_to_V.replace(np.nan, -np.inf, inplace=True)
+E_to_V[E_to_V>1] = 1
+ax = plt.axes()
+
+cmap.set_under('w')
+im = imshow(E_to_V, interpolation="nearest", cmap=cmap)
+ax.set_xticks([])
+ax.set_yticks([])
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+divider = make_axes_locatable(ax)
+cax = divider.append_axes("right", size="5%", pad=0.05)
+plt.colorbar(im, cax=cax)
+plt.clim(0,1)
+plt.tight_layout()
+plt.savefig('../res/expression_regulation_matrix.svg')
+
+plt.figure()
+x = pairwise_E_to_V.gr_ratio
+x = pairwise_E_to_V.gr_ratio
+plt.scatter()
+#ax.set_xticklabels(gc, rotation='vertical')
+#ax.set_yticks(range(len(gc)))
+#ax.set_yticklabels(gc)
+#plt.ylabel(gc)
 #ax1.set_title(r'acetate $(C_1)$ $\longrightarrow $ glucose $(C_2)$', weight='book', size=15)
 #ax1.set_xlabel(r'fold change $\frac{E[{C_2}]}{E[{C_1}]}$', size=15)
 

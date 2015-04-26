@@ -27,21 +27,20 @@ other_reactions = reactions - corrected_reactions
 newrmax = newrmax[corrected_reactions]
 
 fig = plt.figure(figsize=(6,6))
-ax = plt.axes(axisbg=(0.95,0.92,0.90))
+ax = plt.axes()
 
 labels = []
 for r in corrected_reactions:
-    if newrmax[r] / rmax[r] > 2:
+    if newrmax[r] / rmax[r] > 1.5:
         labels.append(r)
-        ax.text(kcat[r], newrmax[r], mm.gene_names[b_to_r[r]], ha='center', va='center', zorder=5)        
     ax.vlines(kcat[r], rmax[r], newrmax[r], zorder=3, color='0.5')
 
 ax.scatter(kcat[corrected_reactions],rmax[corrected_reactions], s=5, c='0.5', zorder=3, edgecolor='none')
 report = p.plot_kcat_rcat_correlation(kcat[corrected_reactions], newrmax[corrected_reactions], fig, ax, 
-                                color='r', yerr='none', labels=set(corrected_reactions) - set(labels+['UAGDP']), fit_on=True)
+                                color='r', yerr='none', labels=labels, fit_on=True)
 
                                 
-ax.set_ylabel(r'in vivo $r_{\mathrm{max}}$ / $\theta(c)$ $\left[s^{-1}\right]$', size=20, style='italic')
+ax.set_ylabel(r'in vivo $r_{\mathrm{max}}$ / $S \cdot T$ $\left[s^{-1}\right]$', size=20, style='italic')
 ax.set_xlabel(r'in vitro $k_{\mathrm{cat}}$ $\left[s^{-1}\right]$', size=20)
 ax.tick_params(axis='both', which='both', top='off', right='off')
 
