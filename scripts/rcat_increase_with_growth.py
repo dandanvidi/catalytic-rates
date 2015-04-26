@@ -43,18 +43,18 @@ colors = ['#996633' if rc.growth_conditions.carbon[c]!='glc' else '#CC0066' for 
 '''efficiency cdf plot'''
 fig = plt.figure(figsize=(5,3.2))
 ax = plt.axes()
-ax.set_axis_bgcolor((0.95,0.92,0.90))
+#ax.set_axis_bgcolor((0.95,0.92,0.90))
 ax.scatter(gr, med, zorder=10, c=colors, edgecolor='none', s=100, alpha=0.75)
 ax.axhline(kcat.median(), color='k', ls='-', lw=2, zorder=10)
 for i, c in enumerate(gr.index):
     ax.errorbar(gr[c], med[c], boot_strap(rcat[c]), c=colors[i], zorder=10)
-ax.grid(color='w', ls='-', lw=1.2, zorder=0)
-ax.tick_params(color='k')
+#ax.grid(color='w', ls='-', lw=1.2, zorder=0)
+#ax.tick_params(color='k')
 ax.set_xticks(np.arange(0,0.8,0.2))
 ax.set_yticks(np.arange(0,11,2))
 ax.tick_params(axis='both', which='both', top='off', right='off')
 ax.set_xlabel(r'growth rate $\left[h^{-1}\right]$', size=13)
-ax.set_ylabel('$r_{\mathrm{cat}} / k_{\mathrm{cat}}$', size=18)
+ax.set_ylabel('$k_{\mathrm{cat}}$', size=18)
 plt.tight_layout()
 plt.savefig('../res/rcat_increase_with_gr.pdf')#
 #ax.tick_params(axis='x', which='both', top='off', bottom='on')

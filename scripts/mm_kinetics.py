@@ -29,30 +29,30 @@ fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(8,3.5), sharey=True)
 ax1.scatter(S, (rmax/kcat)[temp], s=50, alpha=0.4, edgecolor='0.5', zorder=3)            
 ax1.set_xlim(1/1000.0, 3)
 ax1.set_ylim(1/1000.0, 30)
-ax1.axhline(1, 1e-3,3, ls=':', lw=3, color='r')
-ax1.axvline(1, 0, 1e3, ls=':', lw=3, color='r')
+ax1.axhline(1, 1e-3,3, ls=':', lw=3, color='k')
+ax1.axvline(1, 0, 1e3, ls=':', lw=3, color='k')
 ax1.set_ylabel(r'$r_{\rm{max}}$ / $k_{\rm{cat}}$', size=20)
 ax1.set_xlabel('$ S $', size=20)
 ax1.tick_params(axis='both', which='both', top='off', right='off')
-ax1.plot(np.logspace(-3,0), np.logspace(-3,0), 'k:')
+ax1.plot(np.logspace(-3,0), np.logspace(-3,0), 'r:', lw=3)
 
 ax2.scatter(T, (rmax/kcat)[temp], s=50, color='#FFCC00', alpha=0.5, edgecolor='0.5', zorder=3)            
 ax2.set_xlim(1/1000.0, 3)
 ax2.set_ylim(1/1000.0, 30)
-ax2.axhline(1, 1e-3,3, ls=':', lw=3, color='r')
-ax2.axvline(1, 0, 1e3, ls=':', lw=3, color='r')
+ax2.axhline(1, 1e-3,3, ls=':', lw=3, color='k')
+ax2.axvline(1, 0, 1e3, ls=':', lw=3, color='k')
 ax2.set_xlabel('$ T $', size=20)
 ax2.tick_params(axis='both', which='both', top='off', right='off')
-ax2.plot(np.logspace(-3,0), np.logspace(-3,0), 'k:')
+ax2.plot(np.logspace(-3,0), np.logspace(-3,0), 'r:', lw=3)
 
 ax3.scatter(ST, (rmax/kcat)[ST.index], s=50, color='#00A352', alpha=0.4, edgecolor='0.5', zorder=3)            
 ax3.set_xlim(1/1000.0, 3)
 ax3.set_ylim(1/1000.0, 30)
-ax3.axhline(1, 1e-3,3, ls=':', lw=3, color='r', zorder=0)
-ax3.axvline(1, 0, 1e3, ls=':', lw=3, color='r', zorder=0)
+ax3.axhline(1, 1e-3,3, ls=':', lw=3, color='k', zorder=0)
+ax3.axvline(1, 0, 1e3, ls=':', lw=3, color='k', zorder=0)
 ax3.set_xlabel(r'$ S $  x  $ T $', size=20)
 ax3.tick_params(axis='both', which='both', top='off', right='off')
-ax3.plot(np.logspace(-3,0), np.logspace(-3,0), 'k:', zorder=0)
+ax3.plot(np.logspace(-3,0), np.logspace(-3,0), 'r:', lw=3, zorder=0)
 
 r_to_b = mm.map_model_reaction_to_genes()
 
@@ -110,7 +110,7 @@ ax3.set_yscale('log')
 
 plt.tight_layout()
 
-plt.savefig('../res/saturation_and_thermodynamics.svg')
+plt.savefig('../res/saturation_and_thermodynamics.pdf')
 
 #
 #

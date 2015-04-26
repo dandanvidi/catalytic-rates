@@ -37,7 +37,7 @@ for r in corrected_reactions:
 
 ax.scatter(kcat[corrected_reactions],rmax[corrected_reactions], s=5, c='0.5', zorder=3, edgecolor='none')
 report = p.plot_kcat_rcat_correlation(kcat[corrected_reactions], newrmax[corrected_reactions], fig, ax, 
-                                color='r', yerr='none', labels=labels, fit_on=True)
+                                color='#AA6939', yerr='none', labels=labels, fit_on=True)
 
                                 
 ax.set_ylabel(r'in vivo $r_{\mathrm{max}}$ / $S \cdot T$ $\left[s^{-1}\right]$', size=20, style='italic')
