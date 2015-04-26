@@ -7,9 +7,10 @@ from cobra.manipulation.modify import convert_to_irreversible
 import pandas as pd
 import matplotlib.pyplot as plt 
 import numpy as np
-from itertools import combinations_with_replacement
+from itertools import combinations
 from matplotlib import cm
 
+model_fname = "../data/iJO1366_curated.xml"
 model = create_cobra_model_from_sbml_file(model_fname)
 rc = RCAT(model)
 
