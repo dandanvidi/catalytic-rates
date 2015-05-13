@@ -63060,7 +63060,7 @@
       <reaction id="R_METS" name="methionine synthase" reversible="false">
         <notes>
           <body xmlns="http://www.w3.org/1999/xhtml">
-            <p>GENE_ASSOCIATION: (b4019 or b3829)</p>
+            <p>GENE_ASSOCIATION: (b3829)</p>
             <p>SUBSYSTEM: Methionine Metabolism</p>
             <p>EC Number: 2.1.1.13</p>
           </body>

@@ -87,7 +87,7 @@ class MODEL(object):
                 if val.find('EC Number:') != -1:
                     ec = val[11:].encode('utf-8')            
                     ec_list.append(ec)
-
+                
         r_to_ec = dict(zip(self.model.reactions, ec_list))        
         convert_to_irreversible(self.model)
         for r in self.model.reactions:
@@ -101,6 +101,32 @@ class MODEL(object):
         
         return 
        
+    def map_model_reactions_to_enzymes(self, model_fname):
+        
+        ''' parse the sbml model file to extract EC numbers of reactions '''
+        
+        document = parse(model_fname)
+        ec_list = []
+        for r_elem in document.getElementsByTagName('reaction'):
+            for p_elem in r_elem.getElementsByTagName('p'):
+                val = p_elem.childNodes[0].nodeValue
+                if val.find('GENE_ASSOCIATION:') != -1:
+                    ec = val[11:].encode('utf-8')            
+                    ec_list.append(ec)
+                
+        r_to_ec = dict(zip(self.model.reactions, ec_list))        
+        convert_to_irreversible(self.model)
+        for r in self.model.reactions:
+            if 'reverse' in r.id:
+                original_r = self.model.reactions.get_by_id(r.id[:-8])
+                r_to_ec[r] = r_to_ec[original_r]
+                
+        r_to_ec = {r.id:v for r,v in r_to_ec.iteritems()}    
+        r_to_ec = pd.DataFrame(r_to_ec.items()).set_index(0)
+        r_to_ec.to_csv("../cache/reactions_to_ec_mapping.csv")
+        
+        return 
+
     def map_model_reaction_to_genes(self):
         ''' 
             find and match all reactions in the model 
@@ -195,7 +221,7 @@ class RCAT(MODEL):
         
         return abundance
 
-    def _calculate_pFBA(self, title, growth_params):
+    def _calculate_pFBA(self, growth_params):
         '''
             calculates parsimoniuos FBA - the objective function is
             to minimize the total sum of fluxes
@@ -214,6 +240,7 @@ class RCAT(MODEL):
 
         convert_to_irreversible(self.model)            
 
+        title = growth_params.name      
         cond = growth_params['carbon']
         growth_rate = growth_params['growth_rate_1_h']
         oxy = growth_params['oxygen_uptake_mmol_gCDW_h']

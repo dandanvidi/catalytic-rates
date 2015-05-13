@@ -35,14 +35,16 @@ for r in corrected_reactions:
         labels.append(r)
     ax.vlines(kcat[r], rmax[r], newrmax[r], zorder=3, color='0.5')
 
-ax.scatter(kcat[corrected_reactions],rmax[corrected_reactions], s=5, c='0.5', zorder=3, edgecolor='none')
+
+ax.scatter(kcat[corrected_reactions],rmax[corrected_reactions], s=15, c='k', zorder=3, edgecolor='none')
 report = p.plot_kcat_rcat_correlation(kcat[corrected_reactions], newrmax[corrected_reactions], fig, ax, 
-                                color='#AA6939', yerr='none', labels=labels, fit_on=True)
+                                color='#AA6939', yerr='none', labels=labels, fit_on=False)
 
                                 
-ax.set_ylabel(r'in vivo $r_{\mathrm{max}}$ / $S \cdot T$ $\left[s^{-1}\right]$', size=20, style='italic')
+ax.set_ylabel(r'in vivo $r_{\mathrm{max}}$ / $ST$ $\left[s^{-1}\right]$', size=20, style='italic')
 ax.set_xlabel(r'in vitro $k_{\mathrm{cat}}$ $\left[s^{-1}\right]$', size=20)
 ax.tick_params(axis='both', which='both', top='off', right='off')
+ax.ticklabel_format(size=40)
 
 plt.tight_layout()
 plt.savefig('../res/correaltion_after_ST.pdf')

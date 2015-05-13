@@ -3,6 +3,7 @@
 from kapp import RCAT, PLOT_DATA
 from cobra.io.sbml import create_cobra_model_from_sbml_file
 import matplotlib.pyplot as plt
+
 model_fname = "../data/iJO1366_curated.xml"
 model = create_cobra_model_from_sbml_file(model_fname)
 
@@ -27,7 +28,7 @@ if 'TPI' in x.index:
                            ha='left', va='center')
 
 report = PLOT_DATA(model).plot_kcat_rcat_correlation(x, y, fig, ax, 
-                                color='#AA6939', yerr='none', labels=reactions)
+                                color='#AA6939', yerr='none', labels=list(reactions), fit_on=False)
 
 ax.set_ylabel(r'in vivo $r_{\mathrm{max}}$ $\left[s^{-1}\right]$', size=20, style='italic')
 ax.set_xlabel(r'in vitro $k_{\mathrm{cat}}$ $\left[s^{-1}\right]$', size=20)
@@ -35,6 +36,4 @@ ax.tick_params(axis='both', which='both', top='off', right='off')
 ax.ticklabel_format(size=40)
 
 plt.tight_layout()
-plt.savefig('../res/kcat_rmax_correlation.pdf')
-
-
+plt.savefig('../res/kcat_rmax_correlation.svg')

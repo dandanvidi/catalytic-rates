@@ -38,62 +38,38 @@ gr = rc.growth_conditions.growth_rate_1_h
 efficiency = rcat.div(kcat, axis=0).dropna()[gr.index].T
 med = rcat.dropna(how='all').median()[gr.index]
 
-colors = ['#996633' if rc.growth_conditions.carbon[c]!='glc' else '#CC0066' for c in gr.index]
+colors = ['#324EAC' if rc.growth_conditions.growth_mode[c]=='chemostat' 
+                            else '#3FBE57' for c in gr.index]
 
 '''efficiency cdf plot'''
 fig = plt.figure(figsize=(5,3.2))
 ax = plt.axes()
 #ax.set_axis_bgcolor((0.95,0.92,0.90))
-ax.scatter(gr, med, zorder=10, c=colors, edgecolor='none', s=100, alpha=0.75)
-ax.axhline(kcat.median(), color='k', ls='-', lw=2, zorder=10)
+medchemo = med[rc.growth_conditions[rc.growth_conditions.growth_mode=='chemostat'].index]
+grchemo = gr[rc.growth_conditions[rc.growth_conditions.growth_mode=='chemostat'].index]
+ax.scatter(grchemo, medchemo, zorder=10, c='#324EAC', edgecolor='none', s=50, alpha=0.75, label='chemostat')
+
+medbatch = med[rc.growth_conditions[rc.growth_conditions.growth_mode=='batch'].index]
+grbatch = gr[rc.growth_conditions[rc.growth_conditions.growth_mode=='batch'].index]
+ax.scatter(grbatch, medbatch, zorder=10, c='#3FBE57', edgecolor='none', s=50, alpha=0.75, label='batch')
+
+ax.axhline(kcat.median(), color='k', ls=':', lw=3, zorder=10)
+
+
+
 for i, c in enumerate(gr.index):
-    ax.errorbar(gr[c], med[c], boot_strap(rcat[c]), c=colors[i], zorder=10)
-#ax.grid(color='w', ls='-', lw=1.2, zorder=0)
-#ax.tick_params(color='k')
+    ax.errorbar(gr[c], med[c], boot_strap(rcat[c]), c=colors[i], zorder=10, alpha=0.5)
+
+ax.text(.1, kcat.median()+0.25, 
+         '$k_{\mathrm{cat}}$ median', 
+         va='bottom', size=13)
 ax.set_xticks(np.arange(0,0.8,0.2))
-ax.set_yticks(np.arange(0,11,2))
+ax.set_yticks(np.arange(0,12.1,2))
+ax.set_xticklabels(np.arange(0,0.8,0.2), size=12.5)
+ax.set_yticklabels(np.arange(0,13,2), size=12.5)
 ax.tick_params(axis='both', which='both', top='off', right='off')
-ax.set_xlabel(r'growth rate $\left[h^{-1}\right]$', size=13)
-ax.set_ylabel('$k_{\mathrm{cat}}$', size=18)
+ax.set_xlabel(r'growth rate $[h^{-1}]$', size=13)
+ax.set_ylabel('median $r_{\mathrm{cat}}$ $[s^{-1}]$', size=13)
+plt.legend(loc=4, scatterpoints=1)
 plt.tight_layout()
 plt.savefig('../res/rcat_increase_with_gr.pdf')#
-#ax.tick_params(axis='x', which='both', top='off', bottom='on')
-#ax.tick_params(axis='y', which='both', left='on', right='off')
-#
-#ax.set_xlim(0,0.7)
-#ax.set_ylim(0,1)
-#
-#plt.tight_layout()
-#plt.savefig('../res/catalytic_efficacy.pdf')
-#
-#'''rcat increase scatter plot'''
-#fig = plt.figure(figsize=(7,4.5))
-#ax = fig.add_subplot(111, axisbg='0.95')
-#
-#ax.scatter(gr, med, s=100, edgecolor='w', color='#9966FF')
-#
-#for c in efficacy.index:
-#    plt.errorbar(gr[c], med[c], color='#9966FF', 
-#                 yerr=boot_strap(rcat.dropna(how='all')[c]))
-#
-#ax.hlines(rmax.median(), 0, 0.7, lw=3, color='k', linestyles=':')
-#ax.text(.1, rmax.median()+0.01, 
-#         r'$r_{\mathrm{cat}}^{\mathrm{max}}\/median\/across\/all\/enzymes}$', 
-#         va='bottom', size=15)
-#
-#ax.hlines(kcat.median(), 0, 0.7, lw=3, color='r', linestyles=':')
-ax.text(.1, kcat.median()+0.01, 
-         r'$k_{\mathrm{cat}}$', 
-         va='bottom', size=15)
-#
-#ax.set_xlabel(r'growth rate $\left[h^{-1}\right]$', size=15)
-#ax.set_ylabel('median catalytic rate $[s^{-1}]$', size=15)
-#
-#ax.tick_params(axis='x', which='both', top='off', bottom='on')
-#ax.tick_params(axis='y', which='both', left='on', right='off')
-#
-#ax.set_xlim(0,0.7)
-##ax.set_ylim(0,1)
-#
-#plt.tight_layout()
-#plt.savefig('../res/rcat_increases_with_growth.pdf')
