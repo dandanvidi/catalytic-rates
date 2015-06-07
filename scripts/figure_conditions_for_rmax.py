@@ -21,7 +21,7 @@ ax = plt.axes()
 bar = plt.bar(range(len(conds)), values)
 plt.xticks(np.arange(0,len(conds))+0.4, labels, rotation=90)
 
-gc = pd.DataFrame.from_csv("../data/new_dataset/growth_conditions.csv")
+gc = pd.DataFrame.from_csv("../data/growth_conditions.csv")
 cs = [gc['carbon source'][l] for l in labels]
 cs_dist = Counter(cs)
 colors = ColorMap(cs_dist)
