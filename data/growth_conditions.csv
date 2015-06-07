@@ -1,22 +1,32 @@
-title,alternative_name,carbon,growth_mode,growth_rate_1_h,oxygen_uptake_mmol_gCDW_h,cell_volume_l,source
-Chemostat_vilu_011,Chemostat 0.11 V,glc,chemostat,0.11,-1000,2.1E-015,vilu
-Chemostat_heinmann_012,Chemostat 0.12 H,glc,chemostat,0.12,-1000,2.1E-015,heinmann
-galactose_heinmann,Galactose_H,gal,batch,0.17,-1000,1.9E-015,heinmann
-Chemostat_heinmann_02,Chemostat 0.2 H,glc,chemostat,0.2,-1000,2.2E-015,heinmann
-Chemostat_vilu_021,Chemostat 0.21 V,glc,chemostat,0.21,-1000,2.2E-015,vilu
-acetate_heinmann,Acetate H,ac,batch,0.29,-1000,2.4E-015,heinmann
-Chemostat_vilu_031,Chemostat 0.31 V,glc,chemostat,0.31,-1000,2.3E-015,vilu
-Chemostat_heinmann_035,Chemostat 0.35 H,glc,chemostat,0.35,-1000,2.4E-015,heinmann
-glucosamine_heinmann,Glucosamine H,gam,batch,0.39,-1000,2.9E-015,heinmann
-pyruvate_heinmann,Pyruvate H,pyr,batch,0.4,-1000,2.1E-015,heinmann
-succinate_heinmann,Succinate H,succ,batch,0.4,-1000,2.4E-015,heinmann
-Chemostat_vilu_04,Chemostat 0.4 V,glc,chemostat,0.4,-1000,2.5E-015,vilu
-fumarate_heinmann,Fumarate H,fum,batch,0.47,-1000,2.4E-015,heinmann
-glycerol_heinmann,Glycerol H,glyc,batch,0.47,-1000,2.3E-015,heinmann
-Chemostat_vilu_049,Chemostat 0.49 V,glc,chemostat,0.49,-1000,2.6E-015,vilu
-Chemostat_heinmann_05,Chemostat 0.5 H,glc,chemostat,0.5,-1000,2.6E-015,heinmann
-pH6_heinmann,pH6 H,glc,batch,0.5,-1000,3.1E-015,heinmann
-anaerobic_heinmann,Anaerobic,glc,batch,0.55,-0.001,2.9E-015,heinmann
-glucose_heinmann,Batch H,glc,batch,0.6,-1000,3.2E-015,heinmann
-42Cdeg_henimann,42C H,glc,batch,0.65,-1000,2.8E-015,heinmann
-NaCl_50mM_heinmann,NaCl 50mM H,glc,batch,0.65,-1000,2.8E-015,heinmann
+Growth condition,carbon source,growth mode,uptake rate [mmol/gCDW/h],growth rate (h-1),Stdev,Single cell volume [fl],source
+Chemostat u=0.11,glc,chemostat,,0.11,0,2.1,valgepea
+Chemostat u=0.12,glc,chemostat,,0.12,0,1.9,heinmann
+Chemostat u=0.20,glc,chemostat,,0.2,0,2.08,heinmann
+Chemostat u=0.21 (1),glc,chemostat,2.66,0.21,0,,peebo
+Chemostat u=0.21,glc,chemostat,,0.21,0,2.2,valgepea
+Chemostat u=0.22,glc,chemostat,3.81,0.22,0,,peebo
+Galactose ,gal,batch,,0.26,0.26,2.21,heinmann
+Chemostat u=0.26,glc,chemostat,4.91,0.26,0,,peebo
+Acetate,ac,batch,,0.3,0.04,2.3,heinmann
+Chemostat u=0.31 (1),glc,chemostat,2.78,0.31,0,,peebo
+Chemostat u=0.31,glc,chemostat,,0.31,0,2.3,valgepea
+Chemostat u=0.35,glc,chemostat,,0.35,0,2.4,heinmann
+Chemostat u=0.36,glc,chemostat,3.25,0.36,0,,peebo
+Pyruvate,pyr,batch,,0.4,0.01,2.5,heinmann
+Chemostat u=0.4,glc,chemostat,,0.4,0,2.6,valgepea
+Chemostat u=0.41,glc,chemostat,4.36,0.41,0,,peebo
+Fumarate,fum,batch,,0.42,0.02,2.54,heinmann
+Succinate,succ,batch,,0.44,0,2.58,heinmann
+Glucosamine,gam,batch,,0.46,0.02,2.62,heinmann
+Chemostat u=0.46,glc,chemostat,5.52,0.46,0,,peebo
+Glycerol,glyc,batch,,0.47,0.01,2.64,heinmann
+Mannose,man,batch,,0.47,0.01,2.64,heinmann
+Chemostat u=0.49,glc,chemostat,,0.49,0,2.5,valgepea
+Chemostat u=0.5,glc,chemostat,,0.5,0,2.69,heinmann
+Chemostat u=0.51,glc,chemostat,6.24,0.51,0,,peebo
+Xylose,xyl_D,batch,,0.55,0.01,2.79,heinmann
+Glucose + salts,glc,batch,,0.55,0.01,2.79,heinmann
+Glucose,glc,batch,,0.58,0.01,2.84,heinmann
+pH6 glucose,glc,batch,,0.63,0,2.93,heinmann
+Fructose,fru,batch,,0.65,0,2.96,heinmann
+42C glucose,glc,batch,,0.66,0.02,2.98,heinmann
