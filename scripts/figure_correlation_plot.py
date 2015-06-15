@@ -40,34 +40,8 @@ def plot_kcat_rcat_correlation(x, y, fig, ax, color='b', edge='none',
     ax.set_yscale('log', nonposy='clip')
                     
     if labels!={}:
-        ann = []
-        for r, name in labels.iteritems():
-            if x[r]>y[r]:
-                ann.append(ax.text(x[r], y[r]/1.1, name, 
-                                    ha='center', va='top', zorder=5))
-            if x[r]<y[r]:
-                ann.append(ax.text(x[r], y[r]*1.1, name,
-                                    ha='center', va='bottom', zorder=5))
-                                        
-            mask = np.zeros(fig.canvas.get_width_height(), bool)
-            fig.canvas.draw()
-            for i, a in enumerate(ann):
-                bbox = a.get_window_extent()
-                x0 = int(bbox.x0)
-                x1 = int(math.ceil(bbox.x1))
-                y0 = int(bbox.y0)
-                y1 = int(math.ceil(bbox.y1))
-            
-                s = np.s_[x0:x1, y0:y1]
-                if hide_overlap:
-                    if np.any(mask[s]):
-                        a.set_visible(False)
-                    else:
-                        mask[s] = True
-                else:
-                    mask[s] = True
-                
-                
+        add_labels(x, y, labels, ax, fig, hide_overlap)
+                                
     for tickx, ticky in zip(ax.xaxis.get_major_ticks(), ax.yaxis.get_major_ticks()):
         tickx.label.set_fontsize(14) 
         ticky.label.set_fontsize(14)
@@ -76,6 +50,34 @@ def plot_kcat_rcat_correlation(x, y, fig, ax, color='b', edge='none',
     ax.set_ylim(1e-3/4,4*1e3)
 
     return output
+
+def add_labels(x, y, labels, ax, fig, hide_overlap=True):
+    ann = []
+    for r, name in labels.iteritems():
+        if x[r]>y[r]:
+            ann.append(ax.text(x[r], y[r]/1.1, name, 
+                                ha='center', va='top', zorder=5))
+        if x[r]<y[r]:
+            ann.append(ax.text(x[r], y[r]*1.1, name,
+                                ha='center', va='bottom', zorder=5))
+                                    
+        mask = np.zeros(fig.canvas.get_width_height(), bool)
+        fig.canvas.draw()
+        for i, a in enumerate(ann):
+            bbox = a.get_window_extent()
+            x0 = int(bbox.x0)
+            x1 = int(math.ceil(bbox.x1))
+            y0 = int(bbox.y0)
+            y1 = int(math.ceil(bbox.y1))
+        
+            s = np.s_[x0:x1, y0:y1]
+            if hide_overlap:
+                if np.any(mask[s]):
+                    a.set_visible(False)
+                else:
+                    mask[s] = True
+            else:
+                mask[s] = True
 
 if __name__ == "__main__":
     
@@ -88,7 +90,9 @@ if __name__ == "__main__":
     index = kcat.index & rmax.index
     x = kcat[index]
     y = rmax[index]
-    labels = {k:v for k,v in R.map_reactions_to_gene_names().iteritems() if k in index}
+    res = np.abs(np.log10(x) - np.log10(y))
+    labels = res[res>=1] # at least 10 fold difference
+    labels = {k:v for k,v in R.map_reactions_to_gene_names().iteritems() if k in labels}
     report = plot_kcat_rcat_correlation(x, y, fig, ax, 
                                color='#AA6939', edge='none', 
                                yerr='none', labels=labels, 
@@ -97,10 +101,12 @@ if __name__ == "__main__":
     
     rmse = np.sqrt( report.sum_square / len(x) )
     r, pval = stats.pearsonr(np.log10(x), np.log10(y))
-    ax.text(1e-3/2, 1e2/1.25, '$R^2=$%.2f\n$RMSE=$%.2f' %(r**2,rmse), size=15)
+    ax.text(1e-3/2, 1e2/1.25, '$R^2=$%.2f' %r**2, size=15)
     
-    # specif labels to add
-    ax.text(x['TPI'], y['TPI']*1.1, 'tpi', ha='center', va='bottom', zorder=5)
+    labels = {k:v for k,v in R.map_reactions_to_gene_names().iteritems() if k in index}    
+    add_labels(x, y, labels, ax, fig)    # specif labels to add
+#    ['TPI,PFK,DXS,PANTS,PPPGO3,HMBS,GHMT2r']
+#    for r in manual.split(','):
     ax.text(x['PFK'], y['PFK']*1.1, 'pfkA', ha='center', va='bottom', zorder=5)
     
     ax.set_ylabel(r'in vivo $r_{\mathrm{max}}$ $\left[s^{-1}\right]$', 
@@ -114,4 +120,4 @@ if __name__ == "__main__":
     ax.set_ylim(1e-3/4,4*1e3)
     
     plt.tight_layout()
-    plt.savefig('../res/kcat_rmax_correlation.svg')
+    plt.savefig('../res/kcat_rmax_correlation.png')

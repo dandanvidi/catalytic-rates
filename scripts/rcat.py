@@ -108,4 +108,5 @@ class RCAT(object):
 
         return kcats['kcat per subunit']        
 
-R = RCAT()
+if __name__ == "__main__":
+    R = RCAT()
