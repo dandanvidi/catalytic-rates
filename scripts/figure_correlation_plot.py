@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-def plot_kcat_rcat_correlation(x, y, fig, ax, color='b', edge='none', 
+def plot_kcat_rmaxn_correlation(x, y, fig, ax, color='b', edge='none', 
                                yerr='none', labels={}, hide_overlap=True,
                                fit=False, zorder=3):
     
@@ -85,15 +85,15 @@ if __name__ == "__main__":
     fig = plt.figure(figsize=(6,6))
     ax = plt.axes()
     rcat = R.rcat
-    kcat = R.kcat
-    rmax = R.rmax['rmax [s^-1]']
-    index = kcat.index & rmax.index
+    kcat = R.kcat['kcat [s^-1]']
+    rmaxn = R.rmaxn['rmax x n [s^-1]']
+    index = kcat.index & rmaxn.index
     x = kcat[index]
-    y = rmax[index]
+    y = rmaxn[index]
     res = np.abs(np.log10(x) - np.log10(y))
     labels = res[res>=1] # at least 10 fold difference
     labels = {k:v for k,v in R.map_reactions_to_gene_names().iteritems() if k in labels}
-    report = plot_kcat_rcat_correlation(x, y, fig, ax, 
+    report = plot_kcat_rmaxn_correlation(x, y, fig, ax, 
                                color='#AA6939', edge='none', 
                                yerr='none', labels=labels, 
                                fit=False)
@@ -109,9 +109,9 @@ if __name__ == "__main__":
 #    for r in manual.split(','):
     ax.text(x['PFK'], y['PFK']*1.1, 'pfkA', ha='center', va='bottom', zorder=5)
     
-    ax.set_ylabel(r'in vivo $r_{\mathrm{max}}$ $\left[s^{-1}\right]$', 
+    ax.set_ylabel(r'in vivo $r_{\mathrm{max}}\,\cdot\,n\,\left[s^{-1}\right]$', 
                   size=20, style='italic')
-    ax.set_xlabel(r'in vitro $k_{\mathrm{cat}}$ $\left[s^{-1}\right]$', 
+    ax.set_xlabel(r'in vitro $k_{\mathrm{cat}}\,\left[s^{-1}\right]$', 
                   size=20, style='italic')
     ax.tick_params(axis='both', which='both', top='off', right='off')
     ax.ticklabel_format(size=40)

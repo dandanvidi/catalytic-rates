@@ -1,0 +1,379 @@
+,Vmax [umol/mg/min],subsystem,condition,carbon source
+3OAR140,3.06470037031836,Cell Envelope Biosynthesis,42C glucose,glc
+3OAS140,0.9197047133924391,Cell Envelope Biosynthesis,Chemostat u=0.49,glc
+5DOAN,0.035471812989952375,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+A5PISO,35.35063415175227,Alternate Carbon Metabolism,Glucose + salts,glc
+AACPS3,2.0082409369108496,Cell Envelope Biosynthesis,Chemostat u=0.51,glc
+AACPS4,2.3670015016894825,Cell Envelope Biosynthesis,Chemostat u=0.51,glc
+AACPS7,1.2245693944444003,Cell Envelope Biosynthesis,Chemostat u=0.51,glc
+ACACT1r,109.97947189930672,Membrane Lipid Metabolism,pH6 glucose,glc
+ACACT2r,109.97947189930672,Membrane Lipid Metabolism,pH6 glucose,glc
+ACACT3r,109.97947189930672,Membrane Lipid Metabolism,pH6 glucose,glc
+ACACT4r,109.97947189930672,Membrane Lipid Metabolism,pH6 glucose,glc
+ACACT5r,109.97947189930672,Membrane Lipid Metabolism,pH6 glucose,glc
+ACACT6r,85.92911104426668,Membrane Lipid Metabolism,pH6 glucose,glc
+ACACT7r,85.92911104426668,Membrane Lipid Metabolism,pH6 glucose,glc
+ACCOAC,0.9130890023169462,Membrane Lipid Metabolism,pH6 glucose,glc
+ACGK,18.52755000000514,Arginine and Proline Metabolism,Chemostat u=0.49,glc
+ACGS,277.64542854017884,Arginine and Proline Metabolism,Chemostat u=0.51,glc
+ACHBS,8.255671699492266,"Valine, Leucine, and Isoleucine Metabolism",pH6 glucose,glc
+ACLS,24.843226807111872,"Valine, Leucine, and Isoleucine Metabolism",pH6 glucose,glc
+ACODA,36.225692367327795,Arginine and Proline Metabolism,Chemostat u=0.46,glc
+ACONTa,38.53378337261883,Citric Acid Cycle,Glucose + salts,glc
+ACONTb,38.53378337261883,Citric Acid Cycle,Glucose + salts,glc
+ADCL,2.841116152520319,Cofactor and Prosthetic Group Biosynthesis,Fumarate,fum
+ADCS,1.8183285199734536,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+ADK1,79.56369801159279,Nucleotide Salvage Pathway,Fructose,fru
+ADNK1,0.02039890419857433,Nucleotide Salvage Pathway,Fructose,fru
+ADSK,60.04356819322884,Cysteine Metabolism,Glucose + salts,glc
+ADSL1r,11.61470014144837,Purine and Pyrimidine Biosynthesis,pH6 glucose,glc
+ADSL2r,17.4010570058924,Purine and Pyrimidine Biosynthesis,pH6 glucose,glc
+ADSS,4.210572773841979,Purine and Pyrimidine Biosynthesis,42C glucose,glc
+AGPAT160,297.1961217576359,Glycerophospholipid Metabolism,Chemostat u=0.41,glc
+AGPAT161,350.28848061364,Glycerophospholipid Metabolism,Chemostat u=0.41,glc
+AHCYSNS,0.07062832097554962,Methionine Metabolism,Chemostat u=0.51,glc
+AICART,10.873407685357709,Purine and Pyrimidine Biosynthesis,Chemostat u=0.31,glc
+AIRC2,234.83165719064644,Purine and Pyrimidine Biosynthesis,Chemostat u=0.51,glc
+AKGDH,11.26523984940827,Citric Acid Cycle,42C glucose,glc
+ALAALAr,8.102344230700664,Cell Envelope Biosynthesis,Chemostat u=0.49,glc
+ALAR,174.75405508611266,Alanine and Aspartate Metabolism,42C glucose,glc
+AMAOTr,0.0016636074731254176,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.46,glc
+AMPMS2,0.00582229553182466,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+ANPRT,5.290142328046356,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",Chemostat u=0.31,glc
+ANS,3.8322772143022408,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",Chemostat u=0.31,glc
+AOXSr2,0.0019598816617032834,Cofactor and Prosthetic Group Biosynthesis,pH6 glucose,glc
+APRAUR,0.472222429082305,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+ARGSL,12.809527061277311,Arginine and Proline Metabolism,Chemostat u=0.4,glc
+ARGSS,3.310491509915186,Arginine and Proline Metabolism,Chemostat u=0.35,glc
+ASNS2,30.560195759769314,Alanine and Aspartate Metabolism,42C glucose,glc
+ASP1DC,0.3145511139694882,Cofactor and Prosthetic Group Biosynthesis,Mannose,man
+ASPCT,2.1934967251158852,Purine and Pyrimidine Biosynthesis,42C glucose,glc
+ASPK,5.818889824020999,Threonine and Lysine Metabolism,42C glucose,glc
+ASPO6,4.186395543463926,Cofactor and Prosthetic Group Biosynthesis,Glucosamine,gam
+ATPPRT,3.922088972507766,Histidine Metabolism,pH6 glucose,glc
+ATPS4rpp,105.70021490595552,Oxidative Phosphorylation,pH6 glucose,glc
+BMOCOS,0.024665483524751515,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+BMOGDS1,1.1225639494853776,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+BMOGDS2,1.1225639494853776,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+BPNT,49.63907936261053,Cysteine Metabolism,Chemostat u=0.51,glc
+BTS5,0.003439037757601763,Cofactor and Prosthetic Group Biosynthesis,pH6 glucose,glc
+CA2tex,0.1959110188564631,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+CDPMEK,2.4539571892576206,Cofactor and Prosthetic Group Biosynthesis,Xylose,xyl_D
+CHORM,17.968620939440843,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",Chemostat u=0.49,glc
+CHORS,63.690476544419006,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",Chemostat u=0.51,glc
+CHRPL,0.7298718627314772,Cofactor and Prosthetic Group Biosynthesis,42C glucose,glc
+CLtex,0.1959110188564631,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+COBALT2tex,0.0009409751145843567,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+COBALT2tpp,0.01235898198202712,Inorganic Ion Transport and Metabolism,pH6 glucose,glc
+CPMPS,0.17579404477974167,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.5,glc
+CPPPGO,0.43623208865048707,Cofactor and Prosthetic Group Biosynthesis,Succinate,succ
+CS,36.00470064918791,Citric Acid Cycle,Chemostat u=0.49,glc
+CTPS2,11.320356098592487,Purine and Pyrimidine Biosynthesis,pH6 glucose,glc
+CU2tex,0.026686054249612352,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+CYSS,0.48707529403462946,Cysteine Metabolism,Chemostat u=0.49,glc
+CYSTL,16.837976726928368,Methionine Metabolism,42C glucose,glc
+CYTBO3_4pp,757.915192965859,Oxidative Phosphorylation,Glucose + salts,glc
+CYTK1,58.61417012884007,Nucleotide Salvage Pathway,Chemostat u=0.51,glc
+DALAt2pp,4.917095235824559,"Transport, Inner Membrane",Glucose + salts,glc
+DAPDC,52.438961771987024,Threonine and Lysine Metabolism,Chemostat u=0.49,glc
+DAPE,167.471382106137,Threonine and Lysine Metabolism,Chemostat u=0.35,glc
+DASYN160,125.78167603237979,Glycerophospholipid Metabolism,Glucose,glc
+DASYN161,148.25184099256296,Glycerophospholipid Metabolism,Glucose,glc
+DB4PS,0.8722477140799563,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+DBTS,0.00124521852031374,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+DDPA,4.806385362591871,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",Chemostat u=0.31,glc
+DHAD1,384.2443115353986,"Valine, Leucine, and Isoleucine Metabolism",Chemostat u=0.4,glc
+DHAD2,127.68852102278348,"Valine, Leucine, and Isoleucine Metabolism",Chemostat u=0.4,glc
+DHAPT,35.46521121792611,Alternate Carbon Metabolism,Glycerol,glyc
+DHDPRy,28.62230152224426,Threonine and Lysine Metabolism,Chemostat u=0.41,glc
+DHDPS,20.24489445117341,Threonine and Lysine Metabolism,Chemostat u=0.49,glc
+DHFR,36.37411695469401,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+DHFS,0.29931418184759223,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+DHNPA2r,7.444001867381662,Cofactor and Prosthetic Group Biosynthesis,Glucose,glc
+DHORD2,33.2887011410961,Purine and Pyrimidine Biosynthesis,Chemostat u=0.4,glc
+DHPPDA2,0.472222429082305,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+DHPS2,0.395610571772987,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+DHQS,120.12641834908845,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",Fructose,fru
+DHQTi,129.42251497058382,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",Chemostat u=0.49,glc
+DMATT,0.22336626454779196,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+DMPPS,0.19534164714809493,Cofactor and Prosthetic Group Biosynthesis,Glucose + salts,glc
+DPCOAK,1.690203319876508,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+DPR,0.0016450397585866575,Cofactor and Prosthetic Group Biosynthesis,pH6 glucose,glc
+DTMPK,46.12600176852558,Nucleotide Salvage Pathway,Fructose,fru
+DUTPDP,10.418619997814655,Nucleotide Salvage Pathway,Chemostat u=0.51,glc
+DXPRIi,4.513727659367172,Cofactor and Prosthetic Group Biosynthesis,Glucose + salts,glc
+DXPS,0.9861836194636691,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+E4PD,0.00062954290844983,Cofactor and Prosthetic Group Biosynthesis,Glucose + salts,glc
+ECOAH1,87.52236863335237,Membrane Lipid Metabolism,42C glucose,glc
+ECOAH2,87.52236863335237,Membrane Lipid Metabolism,42C glucose,glc
+ECOAH3,87.52236863335237,Membrane Lipid Metabolism,42C glucose,glc
+ECOAH4,87.52236863335237,Membrane Lipid Metabolism,42C glucose,glc
+ECOAH5,87.52236863335237,Membrane Lipid Metabolism,42C glucose,glc
+ECOAH6,68.38293731795949,Membrane Lipid Metabolism,42C glucose,glc
+ECOAH7,68.38293731795949,Membrane Lipid Metabolism,42C glucose,glc
+EGMEACPR,6.365287430682181e-05,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+ENO,31.34823361188719,Glycolysis/Gluconeogenesis,Chemostat u=0.5,glc
+EPMEACPR,6.365287430682181e-05,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+F6PA,2780.7848205515843,Glycolysis/Gluconeogenesis,Fumarate,fum
+FACOAE120,41.43005270553059,Cell Envelope Biosynthesis,Chemostat u=0.51,glc
+FACOAE160,67.94349772180125,Cell Envelope Biosynthesis,Chemostat u=0.51,glc
+FACOAE161,80.08120847537467,Cell Envelope Biosynthesis,Chemostat u=0.51,glc
+FADRx,693.9187621963111,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+FBA,23.66879279239847,Glycolysis/Gluconeogenesis,Chemostat u=0.51,glc
+FBA3,6.1676918801648055,Pentose Phosphate Pathway,42C glucose,glc
+FE2tex,0.6045200526135741,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+FMNAT,0.1539198832610767,Cofactor and Prosthetic Group Biosynthesis,Glucose + salts,glc
+FUM,278.736442882184,Citric Acid Cycle,42C glucose,glc
+G1PACT,19.27186833929545,Cell Envelope Biosynthesis,Chemostat u=0.41,glc
+G1SAT,0.12322870336123912,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+G3PAT160,0.8934923840531975,Glycerophospholipid Metabolism,Chemostat u=0.51,glc
+G3PAT161,1.0531096025037952,Glycerophospholipid Metabolism,Chemostat u=0.51,glc
+G5SD,18.65116207216719,Arginine and Proline Metabolism,Chemostat u=0.49,glc
+G6PDH2r,166.87552534727968,Pentose Phosphate Pathway,Chemostat u=0.5,glc
+GAPD,48.31697046974977,Glycolysis/Gluconeogenesis,Glucose + salts,glc
+GARFT,288.10746139636154,Purine and Pyrimidine Biosynthesis,Chemostat u=0.36,glc
+GART,0.1761282416863671,Purine and Pyrimidine Biosynthesis,Chemostat u=0.31,glc
+GCALDD,0.024681007108671715,Folate Metabolism,42C glucose,glc
+GF6PTA,1.9678441835487837,Cell Envelope Biosynthesis,Chemostat u=0.51,glc
+GHMT2r,4.2937903898371825,Glycine and Serine Metabolism,Chemostat u=0.49,glc
+GK1,106.51801151438869,Nucleotide Salvage Pathway,Chemostat u=0.51,glc
+GLCptspp,26.795094715834413,"Transport, Inner Membrane",Xylose,xyl_D
+GLCtex,394.13601185333994,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+GLNS,11.824447419600729,Glutamate Metabolism,Chemostat u=0.49,glc
+GLU5K,38.354888150206094,Arginine and Proline Metabolism,Glucose + salts,glc
+GLUPRT,64.51436586283793,Purine and Pyrimidine Biosynthesis,pH6 glucose,glc
+GLUTRS,0.09708301212490286,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+GLYCL,0.2643508825550402,Folate Metabolism,42C glucose,glc
+GLYCTO2,2.256677381585812,Alternate Carbon Metabolism,Glucose + salts,glc
+GMPS2,5.062082126523501,Purine and Pyrimidine Biosynthesis,Mannose,man
+GND,25.39431797710034,Pentose Phosphate Pathway,Fructose,fru
+GRTT,0.22336626454779196,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+GTPCI,0.019608156079061235,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+GTPCII2,0.33311712831275836,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.46,glc
+HACD1,87.52236863335237,Membrane Lipid Metabolism,42C glucose,glc
+HACD2,87.52236863335237,Membrane Lipid Metabolism,42C glucose,glc
+HACD3,87.52236863335237,Membrane Lipid Metabolism,42C glucose,glc
+HACD4,87.52236863335237,Membrane Lipid Metabolism,42C glucose,glc
+HACD5,87.52236863335237,Membrane Lipid Metabolism,42C glucose,glc
+HACD6,68.38293731795949,Membrane Lipid Metabolism,42C glucose,glc
+HACD7,68.38293731795949,Membrane Lipid Metabolism,42C glucose,glc
+HCO3E,21.697087817614644,Unassigned,Chemostat u=0.5,glc
+HISTD,4.061585904660396,Histidine Metabolism,Chemostat u=0.49,glc
+HISTP,5.613051014732547,Histidine Metabolism,pH6 glucose,glc
+HMBS,0.22449032174336517,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+HPPK2,0.5380808412965336,Cofactor and Prosthetic Group Biosynthesis,42C glucose,glc
+HSK,143.97774541528898,Threonine and Lysine Metabolism,Mannose,man
+HSST,13.513781944062767,Methionine Metabolism,Chemostat u=0.51,glc
+HSTPT,5.0389862394272695,Histidine Metabolism,Fructose,fru
+I2FE2SR,1.3903389330124155e-05,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+I2FE2SS,0.001958632570354463,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+I2FE2SS2,0.0017805750639586025,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+I2FE2ST,0.0008356277189866098,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+I4FE4SR,0.008203945066954675,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+I4FE4ST,0.0077594002477327905,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+ICDHyr,14.070191554935185,Citric Acid Cycle,Fructose,fru
+ICYSDS,0.016093404674910872,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+IG3PS,7.220686930275602,Histidine Metabolism,Chemostat u=0.51,glc
+IGPDH,5.613051014732547,Histidine Metabolism,pH6 glucose,glc
+IGPS,6.001750326654878,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",pH6 glucose,glc
+IMPD,2.068058078189887,Purine and Pyrimidine Biosynthesis,Mannose,man
+IPDPS,1.4833317162936273,Cofactor and Prosthetic Group Biosynthesis,Glucose + salts,glc
+IPMD,7.442320331011507,"Valine, Leucine, and Isoleucine Metabolism",pH6 glucose,glc
+IPPS,10.891173772447937,"Valine, Leucine, and Isoleucine Metabolism",pH6 glucose,glc
+K2L4Aabcpp,14.6732241073818,"Transport, Inner Membrane",42C glucose,glc
+K2L4Aabctex,2.7685107907562165,Lipopolysaccharide Biosynthesis / Recycling,Chemostat u=0.41,glc
+KARA2,0.8306889368139659,"Valine, Leucine, and Isoleucine Metabolism",pH6 glucose,glc
+KDOCT2,9.231690473815458,Lipopolysaccharide Biosynthesis / Recycling,Chemostat u=0.5,glc
+KDOPP,30.76772042284881,Lipopolysaccharide Biosynthesis / Recycling,42C glucose,glc
+KDOPS,1.3952836213783302,Lipopolysaccharide Biosynthesis / Recycling,Fructose,fru
+Kt2pp,126.19866106251357,Inorganic Ion Transport and Metabolism,Fructose,fru
+Ktex,7.346870221642573,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+LEUTAi,9.47882941795083,"Valine, Leucine, and Isoleucine Metabolism",42C glucose,glc
+LPADSS,73.8601718875097,Lipopolysaccharide Biosynthesis / Recycling,pH6 glucose,glc
+MALS,13.668256164578647,Anaplerotic Reactions,Pyruvate,pyr
+MCOATA,0.7275237958599465,Membrane Lipid Metabolism,Fructose,fru
+MCTP1App,3.821599317115876,Murein Biosynthesis,pH6 glucose,glc
+MDH,13.27727708913409,Citric Acid Cycle,Chemostat u=0.49,glc
+MECDPDH5,0.2122136600599766,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+MECDPS,0.3202327849340862,Cofactor and Prosthetic Group Biosynthesis,42C glucose,glc
+MEPCT,8.398458117513133,Cofactor and Prosthetic Group Biosynthesis,42C glucose,glc
+METAT,0.0086204181160374,Methionine Metabolism,Chemostat u=0.49,glc
+METS,0.21646997042181912,Methionine Metabolism,pH6 glucose,glc
+MG2tex,0.3265183647607718,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+MNtex,0.026008552167111617,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+MOADSUx,0.004291955519810551,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+MOAT,74.67883801796964,Lipopolysaccharide Biosynthesis / Recycling,Xylose,xyl_D
+MOAT2,74.67883801796964,Lipopolysaccharide Biosynthesis / Recycling,Xylose,xyl_D
+MOBDabcpp,0.0020723673611871647,Inorganic Ion Transport and Metabolism,Xylose,xyl_D
+MOBDtex,0.00485543159125528,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+MOCOS,0.024665483524751515,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+MOHMT,0.029225224036817633,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+MPTAT,1.9281402364943652,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+MPTG,3.821599317115876,Murein Biosynthesis,pH6 glucose,glc
+MPTS,0.1090268608051788,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.46,glc
+MPTSS,3.7222039657547574,Cofactor and Prosthetic Group Biosynthesis,pH6 glucose,glc
+MTHFC,133.27073065293163,Folate Metabolism,Chemostat u=0.46,glc
+MTHFD,133.27073065293163,Folate Metabolism,Chemostat u=0.46,glc
+MTHFR2,4.970693805436372,Folate Metabolism,Chemostat u=0.35,glc
+NADH16pp,794.4234195945517,Oxidative Phosphorylation,Glucose + salts,glc
+NADK,1.9706952597821996,Cofactor and Prosthetic Group Biosynthesis,Glucose,glc
+NADS1,0.09563139467037458,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+NDPK1,10.176068029151528,Nucleotide Salvage Pathway,42C glucose,glc
+NDPK2,5.473781805080397,Nucleotide Salvage Pathway,42C glucose,glc
+NDPK3,2.3284130742307196,Nucleotide Salvage Pathway,42C glucose,glc
+NDPK4,0.3367803902618578,Nucleotide Salvage Pathway,42C glucose,glc
+NH4tex,406.5322640402227,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+NI2tex,0.012157398480429887,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+NI2tpp,0.15967804720779039,Inorganic Ion Transport and Metabolism,pH6 glucose,glc
+NNATr,10.343499686303646,Nucleotide Salvage Pathway,Chemostat u=0.5,glc
+NNDPR,0.8345426269672722,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+O2tex,695.6224231431003,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+OCBT,67.4601088378301,Arginine and Proline Metabolism,42C glucose,glc
+OCTDPS,0.5030515405357685,Cofactor and Prosthetic Group Biosynthesis,42C glucose,glc
+OGMEACPD,7.712926699531648e-05,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+OGMEACPR,7.875977514181641e-05,Cofactor and Prosthetic Group Biosynthesis,42C glucose,glc
+OGMEACPS,0.00012103172705492457,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+OHPBAT,0.0016278631358634327,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.5,glc
+OMPDC,55.67704359983059,Purine and Pyrimidine Biosynthesis,Chemostat u=0.41,glc
+OPHBDC,0.05844866341120609,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.46,glc
+OPHHX,0.06027722843636423,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+OPMEACPD,7.712926699531648e-05,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+OPMEACPR,7.875977514181641e-05,Cofactor and Prosthetic Group Biosynthesis,42C glucose,glc
+OPMEACPS,3.386944971084148e-05,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+P5CR,68.19016286867421,Arginine and Proline Metabolism,Fructose,fru
+PANTS,0.04413627752852623,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+PAPPT3,105.73676079097534,Cell Envelope Biosynthesis,Fructose,fru
+PAPSR,3.44561838681778,Cysteine Metabolism,Chemostat u=0.51,glc
+PDH,17.851003004448327,Glycolysis/Gluconeogenesis,Fumarate,fum
+PDX5POi,0.08016008769627575,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+PDX5PS,0.025909653116536573,Cofactor and Prosthetic Group Biosynthesis,Glucose,glc
+PE160abcpp,34.6513134682239,"Transport, Inner Membrane",42C glucose,glc
+PE161abcpp,15.882920420510935,"Transport, Inner Membrane",42C glucose,glc
+PERD,0.021817507320564235,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+PFK,196.81891804162075,Glycolysis/Gluconeogenesis,Glucose,glc
+PFK_3,99.81165738579995,Pentose Phosphate Pathway,42C glucose,glc
+PGCD,26.56095011562194,Glycine and Serine Metabolism,Mannose,man
+PGI,68.84909655618527,Glycolysis/Gluconeogenesis,Glucose + salts,glc
+PGL,303.70717586070805,Pentose Phosphate Pathway,Chemostat u=0.51,glc
+PIt2rpp,473.35636514776553,Inorganic Ion Transport and Metabolism,Glucose + salts,glc
+PItex,36.30775063026625,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+PMEACPE,0.008009803552012742,Cofactor and Prosthetic Group Biosynthesis,Mannose,man
+PMPK,1.0569524141244881,Cofactor and Prosthetic Group Biosynthesis,42C glucose,glc
+PNTK,0.44290269534705556,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+POR5,16.909152700076657,Pyruvate Metabolism,Chemostat u=0.49,glc
+PPBNGS,0.3999040327836422,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+PPC,28.09441595844477,Anaplerotic Reactions,Glycerol,glyc
+PPCDC,0.20771313160639074,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+PPNCL2,0.20771313160639074,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+PPND,31.82212567103736,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",Chemostat u=0.31,glc
+PPNDH,16.503802609880932,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",pH6 glucose,glc
+PPPGO3,0.3347537151370363,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+PRAGSr,25.932013842119037,Purine and Pyrimidine Biosynthesis,Chemostat u=0.41,glc
+PRAIS,16.310463633742632,Purine and Pyrimidine Biosynthesis,Fructose,fru
+PRAIi,6.001750326654878,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",pH6 glucose,glc
+PRAMPC,56.8771098657363,Histidine Metabolism,Chemostat u=0.46,glc
+PRASCSi,7.760046430780091,Purine and Pyrimidine Biosynthesis,Chemostat u=0.49,glc
+PRATPP,56.8771098657363,Histidine Metabolism,Chemostat u=0.46,glc
+PRFGS,6.112025610771256,Purine and Pyrimidine Biosynthesis,Glucose + salts,glc
+PRMICI,23.399539421420034,Histidine Metabolism,Chemostat u=0.46,glc
+PRPPS,14.056167579911357,Histidine Metabolism,Chemostat u=0.51,glc
+PSCVT,26.846098006347738,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",Chemostat u=0.46,glc
+PSD160,11.163580977121997,Glycerophospholipid Metabolism,Chemostat u=0.51,glc
+PSD161,13.157889798684518,Glycerophospholipid Metabolism,Chemostat u=0.51,glc
+PSERT,12.542375218853666,Glycine and Serine Metabolism,Chemostat u=0.5,glc
+PSP_L,2534.946336211894,Glycine and Serine Metabolism,42C glucose,glc
+PSSA160,17.450322391739167,Glycerophospholipid Metabolism,Glucose + salts,glc
+PSSA161,20.567721007494754,Glycerophospholipid Metabolism,Glucose + salts,glc
+PTPATi,1.8373899920188224,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+QULNS,0.7208679414712259,Cofactor and Prosthetic Group Biosynthesis,Xylose,xyl_D
+RBFK,0.1539198832610767,Cofactor and Prosthetic Group Biosynthesis,Glucose + salts,glc
+RBFSa,0.0408877053881931,Cofactor and Prosthetic Group Biosynthesis,42C glucose,glc
+RBFSb,0.08169009832037398,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+RHCCE,0.010145161951836597,Methionine Metabolism,Chemostat u=0.5,glc
+RNTR1c2,4.469267644784695,Nucleotide Salvage Pathway,Chemostat u=0.49,glc
+RNTR2c2,4.614622179895593,Nucleotide Salvage Pathway,Chemostat u=0.49,glc
+RNTR3c2,4.614622179895593,Nucleotide Salvage Pathway,Chemostat u=0.49,glc
+RNTR4c2,4.469267644784695,Nucleotide Salvage Pathway,Chemostat u=0.49,glc
+RPE,1010.1511821259431,Pentose Phosphate Pathway,Chemostat u=0.35,glc
+SADT2,11.954835872544969,Cysteine Metabolism,Glucose + salts,glc
+SDPDS,622.9256808393542,Threonine and Lysine Metabolism,42C glucose,glc
+SERAT,78.13143081752737,Cysteine Metabolism,Glucose + salts,glc
+SHCHD2,0.40594704984384045,Cofactor and Prosthetic Group Biosynthesis,Glucose,glc
+SHCHF,0.40594704984384045,Cofactor and Prosthetic Group Biosynthesis,Glucose,glc
+SHK3Dr,324.6437110588939,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",42C glucose,glc
+SHKK,57.81482356761533,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",Chemostat u=0.51,glc
+SHSL1,14.560697074174273,Methionine Metabolism,Chemostat u=0.51,glc
+SO4tex,9.492933345972846,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+SUCDi,59.514985463321906,Oxidative Phosphorylation,Glucose + salts,glc
+SULRi,4.177213006686353,Cysteine Metabolism,Glucose + salts,glc
+THDPS,4.763350942216675,Threonine and Lysine Metabolism,Chemostat u=0.5,glc
+THRD_L,106.23735101974596,"Valine, Leucine, and Isoleucine Metabolism",Glycerol,glyc
+THRS,5.046816506922692,Threonine and Lysine Metabolism,42C glucose,glc
+THZPSN3,0.0018402199841017115,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+TKT1,12.444992253095457,Pentose Phosphate Pathway,42C glucose,glc
+TKT2,8.539043875155324,Pentose Phosphate Pathway,42C glucose,glc
+TMDS,14.639722393439355,Nucleotide Salvage Pathway,42C glucose,glc
+TMPK,0.38962074503253474,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
+TMPPP,0.03975116761950621,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+TPI,160.89465134122426,Glycolysis/Gluconeogenesis,Glycerol,glyc
+TRDR,2.5860657838007426,Oxidative Phosphorylation,Chemostat u=0.51,glc
+TRPS3,0.7557206320238584,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",pH6 glucose,glc
+TYRL,0.013965558624192619,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
+U23GAAT,59.31760137571029,Lipopolysaccharide Biosynthesis / Recycling,Fructose,fru
+UAAGDS,8.977785128158422,Cell Envelope Biosynthesis,Chemostat u=0.51,glc
+UAGAAT,0.5389797899814138,Lipopolysaccharide Biosynthesis / Recycling,Chemostat u=0.51,glc
+UAGCVT,4.480807174840542,Cell Envelope Biosynthesis,pH6 glucose,glc
+UAGDP,19.27186833929545,Cell Envelope Biosynthesis,Chemostat u=0.41,glc
+UAGPT3,26.677533438125344,Cell Envelope Biosynthesis,Glucose + salts,glc
+UAMAGS,37.054438570054806,Cell Envelope Biosynthesis,42C glucose,glc
+UAMAS,16.07592472742796,Cell Envelope Biosynthesis,Chemostat u=0.46,glc
+UAPGR,68.57134548138974,Cell Envelope Biosynthesis,Mannose,man
+UDCPDPS,0.28905043388793655,Cofactor and Prosthetic Group Biosynthesis,Glucose + salts,glc
+UGMDDS,20.83052626511016,Cell Envelope Biosynthesis,Chemostat u=0.51,glc
+UHGADA,36.51369056011164,Lipopolysaccharide Biosynthesis / Recycling,Fructose,fru
+UMPK,37.52853139195026,Nucleotide Salvage Pathway,Fructose,fru
+UPP3MT,0.03495448689584923,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
+UPP3S,2.1545138468595826,Cofactor and Prosthetic Group Biosynthesis,Succinate,succ
+UPPDC1,1.233786197555671,Cofactor and Prosthetic Group Biosynthesis,42C glucose,glc
+Zn2tex,0.012834900562930626,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
+ACOAD1f_reverse,239.08015081499371,,pH6 glucose,glc
+ACOAD2f_reverse,239.08015081499371,,pH6 glucose,glc
+ACOAD3f_reverse,239.08015081499371,,pH6 glucose,glc
+ACOAD4f_reverse,239.08015081499371,,pH6 glucose,glc
+ACOAD5f_reverse,239.08015081499371,,pH6 glucose,glc
+ACOAD6f_reverse,186.79799487190593,,pH6 glucose,glc
+ACOAD7f_reverse,85.74047849897723,,pH6 glucose,glc
+ACOTA_reverse,8.018583208200402,,Xylose,xyl_D
+ACtex_reverse,21.927580734163868,,Chemostat u=0.49,glc
+AGPR_reverse,40.81016470616198,,Chemostat u=0.31,glc
+AIRC3_reverse,44.36873627756135,,Chemostat u=0.41,glc
+ALATA_L_reverse,301.25407963157136,,Fructose,fru
+ASAD_reverse,9.371071517989346,,Mannose,man
+ASPTA_reverse,29.41949889389531,,42C glucose,glc
+CO2tex_reverse,775.9405208575887,,Chemostat u=0.49,glc
+CTECOAI7_reverse,41.59397913434224,,42C glucose,glc
+DHORTS_reverse,10.435636255583734,,Chemostat u=0.49,glc
+G3PD2_reverse,56.14143139417899,,Fructose,fru
+GLUDy_reverse,228.52281271909183,,42C glucose,glc
+GLUR_reverse,40.225174053897,,Fructose,fru
+H2Otex_reverse,339.43286336036505,,Chemostat u=0.49,glc
+HSDy_reverse,5.11868387955073,,42C glucose,glc
+Htex_reverse,367.76348709527304,,Chemostat u=0.49,glc
+ILETA_reverse,10.690131672441163,,Mannose,man
+IMPC_reverse,10.873407685357709,,Chemostat u=0.31,glc
+IPPMIa_reverse,14.768040184530939,,pH6 glucose,glc
+IPPMIb_reverse,14.768040184530939,,pH6 glucose,glc
+KARA1_reverse,2.499735262570722,,pH6 glucose,glc
+MEOHtex_reverse,7.527800916674853e-05,,Chemostat u=0.49,glc
+PGAMT_reverse,4.9874822545903434,,Glucose,glc
+PGK_reverse,60.66072189423252,,Chemostat u=0.49,glc
+PGM_reverse,127.88769894243359,,Chemostat u=0.51,glc
+PHETA1_reverse,1.2599191181541516,,42C glucose,glc
+PPM_reverse,0.04088604396688531,,Glucose,glc
+PUNP1_reverse,0.028060548335022768,,Chemostat u=0.49,glc
+RPI_reverse,131.3327042466319,,Fructose,fru
+SDPTA_reverse,10.33027525874278,,Xylose,xyl_D
+SUCOAS_reverse,23.499254043029797,,pH6 glucose,glc
+TRPAS2_reverse,5.638247872075639,,pH6 glucose,glc
+TYRTA_reverse,1.1559546873999786,,42C glucose,glc
+VALTA_reverse,15.570416374177958,,Mannose,man

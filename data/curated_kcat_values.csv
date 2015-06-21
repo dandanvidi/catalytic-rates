@@ -1,4 +1,4 @@
-reactions,bnumber,gene,MW of subunit (KDa),subunits,Catalytic Sites,kcat [1/s],kcat per subunit,EC,ref
+reactions,bnumber,gene,MW of subunit (KDa),subunits,Catalytic Sites,kcat [s^-1],kcat per subunit,EC,ref
 3OAR140,b1093,fabG,25.5600137,4,4,1.341900719,1.341900719,1.1.1.100,
 ACGS,b2818,argA,49.1946058,6,1,125.7414124,20.95690207,2.3.1.1,
 ACODA,b3957,argE,42.3468451,2,2,1600,1600,3.5.1.16,

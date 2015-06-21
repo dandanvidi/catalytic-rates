@@ -24,15 +24,15 @@ class MM_KINETICS(THERMODYNAMICS_FOR_COBRA, RCAT):
         self.CC_CACHE_FNAME = os.path.expanduser('../../component-contribution/cache/component_contribution.mat')
 
         self.metab_conc = pd.read_csv('../data/bennett_metabolite_concentrations[mM].csv') # concentrations in mM
-        self.metab_conc.set_index('Compound Id (KEGG)', inplace=True) 
+        self.metab_conc.set_index('CID', inplace=True) 
         self.metab_conc.dropna(how='all', inplace=True)
         
         self.known_cids = {'C'+'%05i'%c:c for c in self.metab_conc.index}
         
         self.substrates = self.get_reaction_substrates()
         self.Ks = self.get_known_Ks_values()
-    def set_metabolite_concentrations(self, condition):
-        
+
+    def set_metabolite_concentrations(self, condition):        
         #initialize concentrations of metabolites as 100uM
         conc = np.ones((1, len(self.Kmodel.cids))) * 1e-4 # concentrations in M
         for ID, cid  in self.known_cids.iteritems(): # set the conc of known metabolites
@@ -47,6 +47,13 @@ class MM_KINETICS(THERMODYNAMICS_FOR_COBRA, RCAT):
                         conc[0, i] = c  * 1e-3  # concentrations in M
 
         return conc
+    
+    def get_udGm_prime(self):
+        conc = np.ones((1, len(self.Kmodel.cids))) * 1e-3 # concentrations in M
+        udGm_prime = self.udG0_prime + R * default_T * np.dot(np.log(conc), self.Kmodel.S)
+        udGm_prime[udGm_prime>200] = unumpy.uarray(200, 0)
+        udGm_prime[udGm_prime<-200] = unumpy.uarray(-200, 0)        
+        return np.array(udGm_prime)[0]
         
     def get_udGc_prime(self, condition):
         conc = self.set_metabolite_concentrations(condition)
