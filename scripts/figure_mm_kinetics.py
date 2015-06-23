@@ -64,18 +64,15 @@ report = plot_kcat_rmaxn_correlation(x, y, fig, ax, color='#AA6939', labels=labe
                                      hide_overlap=False)
 rmse = np.sqrt( report.sum_square / len(x) )
 r, pval = stats.pearsonr(np.log10(x), np.log10(y))
-##
-ax.text(1e-0/5, 1e2*5, '$R^2=$%.2f (%.2f)' %(r1**2,r**2), size=15)
-ax.set_ylabel(r'in vivo $r_{\mathrm{max}}\,\cdot \, n\, \left[s^{-1}\right]$', 
+ax.set_ylabel(r'in vivo $r_{\mathrm{max}}\,\left[s^{-1}\right]$', 
               size=20, style='italic')
 ax.set_xlabel(r'in vitro $k_{\mathrm{cat}}\,\left[s^{-1}\right]$', 
               size=20, style='italic')
 ax.tick_params(axis='both', which='both', top='off', right='off')
-ax.ticklabel_format(size=40)
 
-ax.set_xlim(1e-1,1e3*2)
-ax.set_ylim(1e-1,1e3*2)
+ax.set_xlim(1e-1*2,1e3*4)
+ax.set_ylim(1e-1*2,1e3*4)
 #
 plt.tight_layout()
-plt.savefig('../res/saturation_and_thermodynamics.svg')
+plt.savefig('%s/svg/saturation_and_thermodynamics_data.svg'%R.path)
 #

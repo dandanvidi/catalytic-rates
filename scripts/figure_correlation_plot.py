@@ -56,10 +56,10 @@ def add_labels(x, y, labels, ax, fig, hide_overlap=True):
     for r, name in labels.iteritems():
         if x[r]>y[r]:
             ann.append(ax.text(x[r], y[r]/1.1, name, 
-                                ha='center', va='top', zorder=5))
+                                ha='center', va='top', zorder=5, size=13))
         if x[r]<y[r]:
             ann.append(ax.text(x[r], y[r]*1.1, name,
-                                ha='center', va='bottom', zorder=5))
+                                ha='center', va='bottom', zorder=5, size=13))
                                     
         mask = np.zeros(fig.canvas.get_width_height(), bool)
         fig.canvas.draw()
@@ -82,7 +82,10 @@ def add_labels(x, y, labels, ax, fig, hide_overlap=True):
 if __name__ == "__main__":
     
     R = RCAT()
-    fig = plt.figure(figsize=(6,6))
+
+    fontsize = 20
+
+    fig = plt.figure(figsize=(8,8))
     ax = plt.axes()
     rcat = R.rcat
     kcat = R.kcat['kcat [s^-1]']
@@ -101,23 +104,21 @@ if __name__ == "__main__":
     
     rmse = np.sqrt( report.sum_square / len(x) )
     r, pval = stats.pearsonr(np.log10(x), np.log10(y))
-    ax.text(1e-3/2, 1e2/1.25, '$R^2=$%.2f' %r**2, size=15)
     
-    labels = {k:v for k,v in R.map_reactions_to_gene_names().iteritems() if k in index}    
-    add_labels(x, y, labels, ax, fig)    # specif labels to add
-#    ['TPI,PFK,DXS,PANTS,PPPGO3,HMBS,GHMT2r']
-#    for r in manual.split(','):
-    ax.text(x['PFK'], y['PFK']*1.1, 'pfkA', ha='center', va='bottom', zorder=5)
+    labels = {k:v for k,v in R.map_reactions_to_gene_names().iteritems() if k in index and k not in labels}    
+    add_labels(x, y, labels, ax, fig)    # specific labels to add
     
-    ax.set_ylabel(r'in vivo $r_{\mathrm{max}}\,\cdot\,n\,\left[s^{-1}\right]$', 
-                  size=20, style='italic')
+    ax.set_ylabel(r'in vivo $r_{\mathrm{max}}\,\left[s^{-1}\right]$', 
+                  size=fontsize, style='italic')
     ax.set_xlabel(r'in vitro $k_{\mathrm{cat}}\,\left[s^{-1}\right]$', 
-                  size=20, style='italic')
+                  size=fontsize, style='italic')
     ax.tick_params(axis='both', which='both', top='off', right='off')
-    ax.ticklabel_format(size=40)
+    
+    [tick.label.set_fontsize(fontsize) for tick in ax.xaxis.get_major_ticks()]
+    [tick.label.set_fontsize(fontsize) for tick in ax.yaxis.get_major_ticks()]
 
     ax.set_xlim(1e-3/4,4*1e3)
     ax.set_ylim(1e-3/4,4*1e3)
     
     plt.tight_layout()
-    plt.savefig('../res/kcat_rmax_correlation.png')
+    plt.savefig('%s/svg/kcat_rmax_correlation.svg'%R.path)

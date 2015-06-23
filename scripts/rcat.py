@@ -30,6 +30,7 @@ class RCAT(object):
         self.v_over_E = self.get_v_over_E()        
         self.minimal_conditions = 5
         self.rmax = self.get_rmax()
+        self.rcatn = self.get_rcatn()
         self.rmaxn = self.get_rmaxn()
         self.vmax = self.get_Vmax() 
         
@@ -45,7 +46,13 @@ class RCAT(object):
         DW_fraction = 0.3 # fraction of DW of cells
         proteomics = proteomics * 1e15 / (rho * DW_fraction)
         return proteomics
-        
+
+    def convert_copies_gCDW_to_copies_fl(self, proteomics):
+        rho = 1100 # average cell density gr/liter
+        DW_fraction = 0.3 # fraction of DW of cells
+        proteomics = proteomics * (rho * DW_fraction) / 1e15
+        return proteomics
+
     def convert_mmol_gCDW_h_to_molecules_gCDW_s(self, flux):
         flux = flux * 6.02214129e23 / 1000/ 3600  
         return flux
@@ -172,6 +179,11 @@ class RCAT(object):
         Vmax['carbon source'] = map(lambda x: self.gc['carbon source'][x], Vmax.condition)
         Vmax.to_csv('../cache/Vmax_values.csv')
         return Vmax
+
+    def get_rcatn(self):
+        reactions = self.kcat.index & self.rmax.index
+        su_per_as = (self.kcat['subunits'] / self.kcat['Catalytic Sites'])[reactions]
+        return self.rcat.loc[reactions].mul(su_per_as, axis=0)
 
     def get_rmaxn(self):
 
