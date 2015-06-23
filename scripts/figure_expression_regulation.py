@@ -93,34 +93,41 @@ ax1.set_ylim(0, 700)
 ax1.set_yticklabels(['0', '', '200', '', '400', '', '600', ''])
 ax1.set_xticklabels(['', '', '0.2', '', '0.4', '', '0.6', ''])
 #
-ax2.set_yticks(np.arange(10,45,10))
-ax2.set_xticklabels([''])
-#ax2.set_yticklabels([''])
-#
-ax3.set_yticks(np.arange(10,45,10))
-ax2.set_xlim(-0.1, 2)
-ax3.set_xlim(-0.1, 2)
-ax3.set_xticks(np.arange(0,2.1, 0.5))
-ax3.set_xticklabels(['0', '', '1', '', '2'])
-
-ax2.set_ylim(0, 45)
-ax3.set_ylim(0, 45)
-#
-#
 ax1.set_xlabel(r'growth rate $[h^{-1}]$', size=fontsize)
 ax1.set_ylabel(r'$E\,\left[\frac{\rm{copies}}{\rm{fL}}\right]$', size=fontsize)
-#
+ax1.tick_params(axis='both', which='both', top='off', right='off')
+
+ax2.set_yticks(np.arange(5,45,10))
+ax2.set_xticklabels([''])
+ax2.set_xlim(-1.1, 2.1)
+ax2.set_ylim(0, 25)
 ax2.set_ylabel('reactions', size=fontsize)
+ax2.tick_params(axis='both', which='both', top='off', right='off')
+#ax2.set_yticklabels([''])
+#
+ax3.set_yticks(np.arange(5,45,10))
+
+ax3.set_xlim(-1.1, 2.1)
+ax3.set_xticks(np.arange(-1,2.1, 0.5))
+ax3.set_xticklabels(['-1', '', '0', '', '1', '', '2'])
+
+
+ax3.set_ylim(0, 25)
+#
+#
+
+#
+
 #
 ax3.set_xlabel(r'$\Delta \log (E) / \Delta \log (v)$', size=fontsize)
 ax3.set_ylabel('reactions', size=fontsize)
 
-ax1.tick_params(axis='both', which='both', top='off', right='off')
-ax2.tick_params(axis='both', which='both', top='off', right='off')
+
+
 ax3.tick_params(axis='both', which='both', top='off', right='off')
 
 plt.tight_layout()
-#plt.savefig('%s/svg/expression_regulation.svg'%R.path)
+plt.savefig('%s/svg/expression_regulation.svg'%R.path)
 
 
 

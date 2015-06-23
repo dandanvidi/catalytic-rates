@@ -16,8 +16,8 @@ ACACT7r,85.92911104426668,Membrane Lipid Metabolism,pH6 glucose,glc
 ACCOAC,0.9130890023169462,Membrane Lipid Metabolism,pH6 glucose,glc
 ACGK,18.52755000000514,Arginine and Proline Metabolism,Chemostat u=0.49,glc
 ACGS,277.64542854017884,Arginine and Proline Metabolism,Chemostat u=0.51,glc
-ACHBS,8.255671699492266,"Valine, Leucine, and Isoleucine Metabolism",pH6 glucose,glc
-ACLS,24.84322680711187,"Valine, Leucine, and Isoleucine Metabolism",pH6 glucose,glc
+ACHBS,8.255671699492268,"Valine, Leucine, and Isoleucine Metabolism",pH6 glucose,glc
+ACLS,24.843226807111872,"Valine, Leucine, and Isoleucine Metabolism",pH6 glucose,glc
 ACODA,36.225692367327795,Arginine and Proline Metabolism,Chemostat u=0.46,glc
 ACONTa,38.53378337261883,Citric Acid Cycle,Glucose + salts,glc
 ACONTb,38.53378337261883,Citric Acid Cycle,Glucose + salts,glc
@@ -51,7 +51,7 @@ ASPCT,2.1934967251158852,Purine and Pyrimidine Biosynthesis,42C glucose,glc
 ASPK,5.818889824020999,Threonine and Lysine Metabolism,42C glucose,glc
 ASPO6,4.186395543463926,Cofactor and Prosthetic Group Biosynthesis,Glucosamine,gam
 ATPPRT,3.922088972507766,Histidine Metabolism,pH6 glucose,glc
-ATPS4rpp,105.70021490595553,Oxidative Phosphorylation,pH6 glucose,glc
+ATPS4rpp,105.7002149059555,Oxidative Phosphorylation,pH6 glucose,glc
 BMOCOS,0.024665483524751515,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
 BMOGDS1,1.1225639494853776,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
 BMOGDS2,1.1225639494853776,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
@@ -204,7 +204,7 @@ MNtex,0.026008552167111617,"Transport, Outer Membrane Porin",Chemostat u=0.49,gl
 MOADSUx,0.004291955519810551,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.49,glc
 MOAT,74.67883801796964,Lipopolysaccharide Biosynthesis / Recycling,Xylose,xyl_D
 MOAT2,74.67883801796964,Lipopolysaccharide Biosynthesis / Recycling,Xylose,xyl_D
-MOBDabcpp,0.0020723673611871647,Inorganic Ion Transport and Metabolism,Xylose,xyl_D
+MOBDabcpp,0.002072367361187165,Inorganic Ion Transport and Metabolism,Xylose,xyl_D
 MOBDtex,0.00485543159125528,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
 MOCOS,0.024665483524751515,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
 MOHMT,0.029225224036817633,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
@@ -215,7 +215,7 @@ MPTSS,3.7222039657547574,Cofactor and Prosthetic Group Biosynthesis,pH6 glucose,
 MTHFC,133.27073065293163,Folate Metabolism,Chemostat u=0.46,glc
 MTHFD,133.27073065293163,Folate Metabolism,Chemostat u=0.46,glc
 MTHFR2,4.970693805436372,Folate Metabolism,Chemostat u=0.35,glc
-NADH16pp,794.4234195945517,Oxidative Phosphorylation,Glucose + salts,glc
+NADH16pp,794.4234195945515,Oxidative Phosphorylation,Glucose + salts,glc
 NADK,1.9706952597821996,Cofactor and Prosthetic Group Biosynthesis,Glucose,glc
 NADS1,0.09563139467037458,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
 NDPK1,10.176068029151528,Nucleotide Salvage Pathway,42C glucose,glc
