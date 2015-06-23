@@ -17,7 +17,7 @@ ACCOAC,0.9130890023169462,Membrane Lipid Metabolism,pH6 glucose,glc
 ACGK,18.52755000000514,Arginine and Proline Metabolism,Chemostat u=0.49,glc
 ACGS,277.64542854017884,Arginine and Proline Metabolism,Chemostat u=0.51,glc
 ACHBS,8.255671699492266,"Valine, Leucine, and Isoleucine Metabolism",pH6 glucose,glc
-ACLS,24.843226807111872,"Valine, Leucine, and Isoleucine Metabolism",pH6 glucose,glc
+ACLS,24.84322680711187,"Valine, Leucine, and Isoleucine Metabolism",pH6 glucose,glc
 ACODA,36.225692367327795,Arginine and Proline Metabolism,Chemostat u=0.46,glc
 ACONTa,38.53378337261883,Citric Acid Cycle,Glucose + salts,glc
 ACONTb,38.53378337261883,Citric Acid Cycle,Glucose + salts,glc
@@ -51,7 +51,7 @@ ASPCT,2.1934967251158852,Purine and Pyrimidine Biosynthesis,42C glucose,glc
 ASPK,5.818889824020999,Threonine and Lysine Metabolism,42C glucose,glc
 ASPO6,4.186395543463926,Cofactor and Prosthetic Group Biosynthesis,Glucosamine,gam
 ATPPRT,3.922088972507766,Histidine Metabolism,pH6 glucose,glc
-ATPS4rpp,105.70021490595552,Oxidative Phosphorylation,pH6 glucose,glc
+ATPS4rpp,105.70021490595553,Oxidative Phosphorylation,pH6 glucose,glc
 BMOCOS,0.024665483524751515,Cofactor and Prosthetic Group Biosynthesis,Chemostat u=0.51,glc
 BMOGDS1,1.1225639494853776,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
 BMOGDS2,1.1225639494853776,Cofactor and Prosthetic Group Biosynthesis,Fructose,fru
@@ -137,7 +137,7 @@ GCALDD,0.024681007108671715,Folate Metabolism,42C glucose,glc
 GF6PTA,1.9678441835487837,Cell Envelope Biosynthesis,Chemostat u=0.51,glc
 GHMT2r,4.2937903898371825,Glycine and Serine Metabolism,Chemostat u=0.49,glc
 GK1,106.51801151438869,Nucleotide Salvage Pathway,Chemostat u=0.51,glc
-GLCptspp,26.795094715834413,"Transport, Inner Membrane",Xylose,xyl_D
+GLCptspp,26.795094715834416,"Transport, Inner Membrane",Xylose,xyl_D
 GLCtex,394.13601185333994,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
 GLNS,11.824447419600729,Glutamate Metabolism,Chemostat u=0.49,glc
 GLU5K,38.354888150206094,Arginine and Proline Metabolism,Glucose + salts,glc
@@ -304,7 +304,7 @@ SHK3Dr,324.6437110588939,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",42
 SHKK,57.81482356761533,"Tyrosine, Tryptophan, and Phenylalanine Metabolism",Chemostat u=0.51,glc
 SHSL1,14.560697074174273,Methionine Metabolism,Chemostat u=0.51,glc
 SO4tex,9.492933345972846,"Transport, Outer Membrane Porin",Chemostat u=0.49,glc
-SUCDi,59.514985463321906,Oxidative Phosphorylation,Glucose + salts,glc
+SUCDi,59.5149854633219,Oxidative Phosphorylation,Glucose + salts,glc
 SULRi,4.177213006686353,Cysteine Metabolism,Glucose + salts,glc
 THDPS,4.763350942216675,Threonine and Lysine Metabolism,Chemostat u=0.5,glc
 THRD_L,106.23735101974596,"Valine, Leucine, and Isoleucine Metabolism",Glycerol,glyc
@@ -367,7 +367,7 @@ KARA1_reverse,2.499735262570722,,pH6 glucose,glc
 MEOHtex_reverse,7.527800916674853e-05,,Chemostat u=0.49,glc
 PGAMT_reverse,4.9874822545903434,,Glucose,glc
 PGK_reverse,60.66072189423252,,Chemostat u=0.49,glc
-PGM_reverse,127.88769894243356,,Chemostat u=0.51,glc
+PGM_reverse,127.88769894243359,,Chemostat u=0.51,glc
 PHETA1_reverse,1.2599191181541516,,42C glucose,glc
 PPM_reverse,0.04088604396688531,,Glucose,glc
 PUNP1_reverse,0.028060548335022768,,Chemostat u=0.49,glc

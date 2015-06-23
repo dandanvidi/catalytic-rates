@@ -26,13 +26,13 @@ def get_foldchange(v, p, conds):
     gr = R.gc['growth rate (h-1)']
     combs = [(i,j) for (i,j) in combinations(conds, 2) if gr[j] > gr[i]]
     combs_all = [(i,j) for (i,j) in combinations(R.gc.index, 2) if gr[j] > gr[i]]    
-    delta_mu = pd.Series(data = map(lambda x: gr[x[1]]/gr[x[0]], combs_all),
+    delta_mu = pd.Series(data = map(lambda x: np.log2(gr[x[1]]/gr[x[0]]), combs_all),
                          index = combs_all)
     delta_p = pd.DataFrame(index=reactions, columns=combs)
     delta_v = pd.DataFrame(index=reactions, columns=combs)
     for (i, j) in combs:
-        delta_p[(i,j)] = p[j] / p[i]
-        delta_v[(i,j)] = v[j] / v[i]
+        delta_p[(i,j)] = np.log2(p[j] / p[i])
+        delta_v[(i,j)] = np.log2(v[j] / v[i])
     return delta_p, delta_v, delta_mu
 
 R = RCAT()
@@ -120,7 +120,7 @@ ax2.tick_params(axis='both', which='both', top='off', right='off')
 ax3.tick_params(axis='both', which='both', top='off', right='off')
 
 plt.tight_layout()
-plt.savefig('%s/svg/expression_regulation.svg'%R.path)
+#plt.savefig('%s/svg/expression_regulation.svg'%R.path)
 
 
 
