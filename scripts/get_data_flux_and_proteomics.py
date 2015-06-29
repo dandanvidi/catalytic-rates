@@ -71,7 +71,7 @@ def perform_pFBA(model, cs, gr, ur):
 if __name__ == "__main__":
 
     get_proteomics()
-    model_fname = "../data/iJO1366_curated.xml"
+    model_fname = "../data/iJO1366.xml"
     model = create_cobra_model_from_sbml_file(model_fname)
     convert_to_irreversible(model)
     reactions = map(lambda x: x.id, model.reactions)

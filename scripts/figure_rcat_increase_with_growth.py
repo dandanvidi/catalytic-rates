@@ -35,13 +35,13 @@ for c in conds:
     label = '$\mu=%.01f\,h^{-1}$'%x[c]
     cdf(rcatn[c], color=cm(x[c]*1.5/x.max()), ax=ax1, label=label, lw=2.5)
     ax1.plot([m, m], [0, 0.5], c=cm(x[c]*1.5/x.max()), ls='-')
-    props = dict(boxstyle='round', facecolor=cm(x[c]*0.8/x.max()))
+    props = dict(boxstyle='round', facecolor=cm(x[c]*0.8/x.max()), edgecolor='none')
     ax1.text(m, 0.025+i, '%0.1f'%m, bbox=props, ha='center', size=fontsize/1.7)    
     i += 0.07
     
 cdf(kcat, color='k', ax=ax1, label=r'$k_{\mathrm{cat}}$', lw=2.5)
 ax1.plot([kcat.median(), kcat.median()], [0, 0.5], c='k', ls='-')
-props = dict(boxstyle='round', facecolor='0.7')
+props = dict(boxstyle='round', facecolor='0.7', edgecolor='none')
 ax1.text(kcat.median(), 0.02+i, '%0.1f'%kcat.median(), bbox=props, ha='center', size=fontsize/1.7)    
 
 ax1.set_xscale('log')
@@ -52,15 +52,18 @@ ax1.legend(loc=0, fontsize=fontsize/1.1, frameon=False, handlelength=1)
 
 
 ax2.set_xticklabels(['', '0.2', '', '0.4', '', '0.6', '', '0.8'])
+ax2.set_yticklabels(['', '', '2', '', '4', '', '6', '', '8'])
 
 for i, c in enumerate(x.index):
     if c not in conds:
         col = '1'
+        zorder = 2
     else:
         col = cm(x[c]/x.max())
-    ax2.scatter(x[c], y[c], zorder=10, c=col, 
+        zorder = 3
+    ax2.scatter(x[c], y[c], zorder=zorder, c=col, 
             edgecolor='k', s=75)
-    ax2.errorbar(x[c], y[c], boot_strap(rcatn[c]), c='k', zorder=0, alpha=0.5)
+    ax2.errorbar(x[c], y[c], 10**boot_strap(np.log10(rcatn[c])), c='k', zorder=0, alpha=0.5)
         
 ax2.set_ylim(0,9)
 #ax.set_ylim(0,0.5)

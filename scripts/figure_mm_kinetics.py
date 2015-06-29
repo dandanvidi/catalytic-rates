@@ -7,6 +7,7 @@ from figure_correlation_plot import plot_kcat_rmaxn_correlation
 from scipy import stats
 
 R = RCAT()
+fontsize = 20
 mm = MM_KINETICS(R.model, list(R.rmax.index))
 x = R.kcat['kcat [s^-1]'][mm.reactions]
 y = R.rmaxn['rmax x n [s^-1]'][mm.reactions]
@@ -46,7 +47,8 @@ x = x[reactions]
 #
 fig = plt.figure(figsize=(6,6))
 ax= plt.axes()
-report1 = plot_kcat_rmaxn_correlation(x, y1, fig, ax, color='k', zorder=4)
+report1 = plot_kcat_rmaxn_correlation(x, y1, fig, ax, color='k', 
+                                      zorder=4, scatter_size=50)
 rmse = np.sqrt( report1.sum_square / len(x) )
 r1, pval1 = stats.pearsonr(np.log10(x), np.log10(y1))
 ##
@@ -54,25 +56,30 @@ r1, pval1 = stats.pearsonr(np.log10(x), np.log10(y1))
 ##
 def stacked_residual(x, y, saturation_effect, thermodynamic_effect, ax):
     for (x0, y0, s, t) in zip(x, y, saturation_effect, thermodynamic_effect):
-        ax.vlines(x0, y0, y0/s, lw=3.5, colors='b', alpha=0.5)
-        ax.vlines(x0, y0/s, y0/(s*t), lw=3.5, colors='#FFCC00', alpha=0.8)
+        ax.vlines(x0, y0, y0/s, lw=3.5, colors='#8383FF')
+        ax.vlines(x0, y0/s, y0/(s*t), lw=3.5, colors='#FFDA47')
 ##
 y = y[reactions]
 stacked_residual(x.values, y.values, S.values, T.values, ax)
 ##
-report = plot_kcat_rmaxn_correlation(x, y, fig, ax, color='#AA6939', labels=labels, 
+report = plot_kcat_rmaxn_correlation(x, y, 
+                                     fig, ax, 
+                                     labels=labels,
+                                     scatter_size=50,
                                      hide_overlap=False)
-rmse = np.sqrt( report.sum_square / len(x) )
+                                     
+rmse1 = np.sqrt( report.sum_square / len(x) )
 r, pval = stats.pearsonr(np.log10(x), np.log10(y))
 ax.set_ylabel(r'in vivo $r_{\mathrm{max}}\,\left[s^{-1}\right]$', 
-              size=20, style='italic')
+              size=fontsize, style='italic')
 ax.set_xlabel(r'in vitro $k_{\mathrm{cat}}\,\left[s^{-1}\right]$', 
-              size=20, style='italic')
+              size=fontsize, style='italic')
 ax.tick_params(axis='both', which='both', top='off', right='off')
 
 ax.set_xlim(1e-1*2,1e3*4)
 ax.set_ylim(1e-1*2,1e3*4)
-#
+[tick.label.set_fontsize(fontsize) for tick in ax.xaxis.get_major_ticks()]
+[tick.label.set_fontsize(fontsize) for tick in ax.yaxis.get_major_ticks()]
 plt.tight_layout()
 plt.savefig('%s/svg/saturation_and_thermodynamics_data.svg'%R.path)
-#
+

@@ -4,14 +4,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-def plot_kcat_rmaxn_correlation(x, y, fig, ax, color='b', edge='none', 
-                               yerr='none', labels={}, hide_overlap=True,
+def plot_kcat_rmaxn_correlation(x, y, fig, ax, color='#9E7E5E', edge='none', 
+                               yerr='none', labels={}, scatter_size=30, hide_overlap=True,
                                fit=False, zorder=3):
     
     logx = np.log10(x)
     logy = np.log10(y)
     
-    ax.scatter(x, y,s=20, c=color, alpha=0.8, marker='o', edgecolor=edge, zorder=zorder)
+    ax.scatter(x, y,s=scatter_size, c=color, marker='o', edgecolor=edge, zorder=zorder)
     
     if yerr != 'none':
         ax.errorbar(x, y, 
@@ -42,13 +42,6 @@ def plot_kcat_rmaxn_correlation(x, y, fig, ax, color='b', edge='none',
     if labels!={}:
         add_labels(x, y, labels, ax, fig, hide_overlap)
                                 
-    for tickx, ticky in zip(ax.xaxis.get_major_ticks(), ax.yaxis.get_major_ticks()):
-        tickx.label.set_fontsize(14) 
-        ticky.label.set_fontsize(14)
-        
-    ax.set_xlim(1e-3/4,4*1e3)
-    ax.set_ylim(1e-3/4,4*1e3)
-
     return output
 
 def add_labels(x, y, labels, ax, fig, hide_overlap=True):
@@ -89,18 +82,17 @@ if __name__ == "__main__":
     ax = plt.axes()
     rcat = R.rcat
     kcat = R.kcat['kcat [s^-1]']
-    rmaxn = R.rmaxn['rmax x n [s^-1]']
+    rmaxn = R.rmaxn['rmax [s^-1]']
     index = kcat.index & rmaxn.index
     x = kcat[index]
     y = rmaxn[index]
     res = np.abs(np.log10(x) - np.log10(y))
     labels = res[res>=1] # at least 10 fold difference
     labels = {k:v for k,v in R.map_reactions_to_gene_names().iteritems() if k in labels}
-    report = plot_kcat_rmaxn_correlation(x, y, fig, ax, 
-                               color='#AA6939', edge='none', 
-                               yerr='none', labels=labels, 
-                               fit=False)
-    
+    report = plot_kcat_rmaxn_correlation(x, y, 
+                                         fig, ax,  
+                                         labels=labels, 
+                                         fit=True)
     
     rmse = np.sqrt( report.sum_square / len(x) )
     r, pval = stats.pearsonr(np.log10(x), np.log10(y))

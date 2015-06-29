@@ -190,8 +190,8 @@ class RCAT(object):
         su_per_as = self.kcat['subunits'] / self.kcat['Catalytic Sites']
 
         rmaxn = self.rmax
-        rmaxn['rmax x n [s^-1]'] = self.rmax['rmax [s^-1]'][self.kcat.index]*su_per_as
-        return rmaxn
+        rmaxn['rmax [s^-1]'] = self.rmax['rmax [s^-1]'][self.kcat.index]*su_per_as
+        return rmaxn[rmaxn['rmax [s^-1]']>0]
 
     def get_kcat(self):
         

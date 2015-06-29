@@ -1,75 +1,102 @@
-'''
-    GENERATE FLUXOMICS CACHE:
-    
-    preforms FBA with minimization of the total sum of fluxes
-    and export the results to a csv file.
-    
-    Arguments:
-        growth conditions
-    
-    Retunrs:
-        csv file with flux distributions across conditions 
-        in molecules_per_second_per_gCD
-
-    While pFBA is calculated across the entire metabolic network, 
-    the output csv file does not include reactions which can be catalyzed
-    by nore then a single gene, to allow a one-to-one relationship between
-    genes, fluxes and enzyme abundances
-    
-'''
-
-
-from kapp import RCAT
+from rcat import RCAT
 import pandas as pd
+import numpy as np
+from cobra.core import Metabolite, Reaction
 from cobra.io.sbml import create_cobra_model_from_sbml_file
 from cobra.manipulation.modify import convert_to_irreversible
-import numpy as np
+from copy import deepcopy
+from cobra.flux_analysis.variability import flux_variability_analysis
 
-model_fname = "data/iJO1366_curated.xml"
-model = create_cobra_model_from_sbml_file(model_fname)
-convert_to_irreversible(model)
+def perform_pFVA(model, cs, gr, ur, reactions, fraction_of_optimum=1.0):
 
-reactions = [r.id for r in model.reactions]
+    model = deepcopy(model)
+    convert_to_irreversible(model)            
 
+    rxns = dict([(r.id, r) for r in model.reactions])
 
-gc = RCAT(model).growth_conditions.T.to_dict()
+    rxns['EX_glc_e'].lower_bound = 0 # uptake of carbon source reaction is initialized    
+    try:
+        rxns['EX_' + cs + '_e'].lower_bound = -ur # redefine sole carbon source uptake reaction in mmol/gr/h
+    except:
+        print cs, ur
+        rxns['EX_glc_e'].lower_bound = -ur
+    rxns['Ec_biomass_iJO1366_core_53p95M'].upper_bound = gr        
+    rxns['Ec_biomass_iJO1366_core_53p95M'].lower_bound = gr            
 
-fmin = pd.DataFrame(index=reactions, 
-                    columns=list(RCAT(model).growth_conditions.index))
-fmax = pd.DataFrame(index=reactions, columns=RCAT(model).growth_conditions.index).astype('float')
+    fake = Metabolite(id='fake')
+    model.add_metabolites(fake)        
+            
+    for r in model.reactions:
+        r.add_metabolites({fake:1})
+        
+    flux_counter = Reaction(name='flux_counter')
+    flux_counter.add_metabolites(metabolites={fake:-1})                
 
-fmin.index.name = 'reactions'
-fmax.index.name = 'reactions'
-
-for i, (c, v) in enumerate(gc.iteritems()):
+    model.add_reaction(flux_counter) 
+    model.change_objective(flux_counter)
     
+    print "solving pFVA"
+    fva = flux_variability_analysis(model, 
+                                    reaction_list=reactions, 
+                                    objective_sense='minimize',
+                                    fraction_of_optimum=fraction_of_optimum)
+                                    
+    return fva
+#    flux_ranges = pd.Series(reactions)
+#
+#    for r, v in fva.iteritems():
+#        flux_ranges[r] = v['maximum'] - v['minimum']
+#
+##        flux_ranges.to_csv("cache/reactions_to_pfva_ranges")
+#
+#    return flux_ranges
+
+
+if __name__ == "__main__":
+
+    R = RCAT()
+    model_fname = "../data/iJO1366.xml"
     model = create_cobra_model_from_sbml_file(model_fname)
-    rate = RCAT(model)
-    fva = rate.calculate_pFVA(title=c, growth_params=v)
-    fmin[c] = [fva[r]['minimum'] for r in reactions]
-    fmax[c] = [fva[r]['maximum'] for r in reactions]
+    convert_to_irreversible(model)
+    fluxes = pd.DataFrame(index=R.rmaxn.index, columns=['minimum', 'maximum'])
+    
+    for c in R.gc.iterrows():
+        reactions = R.rmaxn[R.rmaxn.condition==c[0]].index
+        if len(reactions)!=0:
+            model = create_cobra_model_from_sbml_file(model_fname)
+            convert_to_irreversible(model)
+            gr = c[1]['growth rate (h-1)']
+            cs = c[1]['carbon source']
+            ur = c[1]['uptake rate [mmol/gCDW/h]']
+            if np.isnan(ur):
+                ur = 18.5
+            model = create_cobra_model_from_sbml_file(model_fname)
+            fva = perform_pFVA(model, cs, gr, ur, reactions)
+            for k, v in fva.iteritems():
+                fluxes['minimum'][k] = v['minimum']
+                fluxes['maximum'][k] = v['maximum']
+    
+    fluxes.to_csv('../cache/flux_variability[mmol_h_gCDW]_relaxation=0.csv')
 
-# convert units from mmol/gCDW/h to molecules/gCDW/sec
-fmin = fmin * 6.02214129e23 / 1000 / 3600 
-fmax = fmax * 6.02214129e23 / 1000 / 3600 
-
-# add bnumbers and gene names to dataframe  
-bnumbers = RCAT(model).map_model_reaction_to_genes()
-bnumbers.name='bnumber'
-
-gene_names = pd.Series(RCAT(model).gene_names)
-gene_names.name='gene_name'
-
-genes = pd.DataFrame(bnumbers).join(gene_names, on='bnumber')
-
-fmin = fmin.join(genes, how='left')
-fmax = fmax.join(genes, how='left')
-
-fmin.set_index('bnumber', append=True, inplace=True)
-fmax.set_index('bnumber', append=True, inplace=True)
-
-fmin.set_index('gene_name', append=True, inplace=True)
-fmax.set_index('gene_name', append=True, inplace=True)
-
-fmin.to_csv('cache/fmin_[molecules_per_second_per_gCDW].csv')
-fmax.to_csv('cache/fmax_[molecules_per_second_per_gCDW].csv')
+    model = create_cobra_model_from_sbml_file(model_fname)
+    convert_to_irreversible(model)
+    fluxes = pd.DataFrame(index=R.rmaxn.index, columns=['minimum', 'maximum'])
+    
+    for c in R.gc.iterrows():
+        reactions = R.rmaxn[R.rmaxn.condition==c[0]].index
+        if len(reactions)!=0:
+            model = create_cobra_model_from_sbml_file(model_fname)
+            convert_to_irreversible(model)
+            gr = c[1]['growth rate (h-1)']
+            cs = c[1]['carbon source']
+            ur = c[1]['uptake rate [mmol/gCDW/h]']
+            if np.isnan(ur):
+                ur = 18.5
+            model = create_cobra_model_from_sbml_file(model_fname)
+            fva = perform_pFVA(model, cs, gr, ur, reactions)
+            for k, v in fva.iteritems():
+                fluxes['minimum'][k] = v['minimum']
+                fluxes['maximum'][k] = v['maximum']
+    
+    fluxes.to_csv('../cache/flux_variability[mmol_h_gCDW]_relaxation=0_1.csv')
+    

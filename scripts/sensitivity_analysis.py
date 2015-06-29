@@ -85,27 +85,34 @@ if __name__ == "__main__":
     
     fig = plt.figure(figsize=(6,4))
     ax = plt.axes()
-    plt.scatter(range(len(rmax)), rmax/rmax_mz, c='r', edgecolor='none', s=10, alpha=0.5, label='zero ATP maintenance')
-    plt.scatter(range(len(rmax)), rmax/rmax_mh[rmax.index], c='g', edgecolor='none', alpha=0.5, s=10, label='200% ATP maintenance')
-    plt.scatter(range(len(rmax_ol)), rmax[rmax_ol.index]/rmax_ol, c='b', edgecolor='none', alpha=0.5, s=10, label='50% oxygen uptake')
-    ax.set_yscale('log', basey=2)
+    plt.scatter(range(len(rmax)), rmax_mz/rmax, c='r', edgecolor='none', s=15, 
+                label='zero ATP maintenance')
+    plt.scatter(range(len(rmax)), rmax_mh[rmax.index]/rmax, c='g', edgecolor='none', s=15, 
+                label='200% ATP maintenance')
+
+#    ax.set_yscale('log', basey=2)
 #    ax.set_yscale('log')
     plt.legend(loc=4, scatterpoints=1)
     
-    ax.set_xlim(0, 250)
-    ax.set_ylim(2**-6, 2**3)
+    ax.set_xlim(0, 236)
+    ax.set_ylim(0, 2)
     ax.set_ylabel('$r_\mathrm{max}$ ratio', size=15)
     ax.set_xlabel('enzyme-reaction pair', size=15)
     
 
-    y = rmax[rmax_ol.index]/rmax_ol    
-    x = pd.Series(index=y.index, data = range(len(rmax_ol)))
+#    y = rmax[rmax_ol.index]/rmax_ol    
+#    x = pd.Series(index=y.index, data = range(len(rmax_ol)))
     
-    labels = {k:v for k,v in R.map_reactions_to_gene_names().iteritems() if k in y.index
-                and abs(np.log2(y[k])) > 1}
-#    labels.pop("GART", None)
-    add_labels(x, y, labels, ax, fig, hide_overlap=False)
-#    ax.text(y.index['GART'], y['GART'], 'purT')
-    
+    labels = [r for r in rmax.index if abs(np.log2(rmax/rmax_mz)[r])>0.01]
+    labels += [r for r in rmax.index if abs(np.log2(rmax/rmax_mh)[r])>0.01]
+    labels = list(set(labels))
+    for r in labels:
+        x = list(rmax.index).index(r)
+        y = (rmax_mh/rmax)[r]
+        y1 = (rmax_mz/rmax)[r]
+        ax.text(x, y, R.map_reactions_to_gene_names()[r], va='center', ha='center')
+        plt.plot([x,x], [min(y, y1),max(y, y1)], c='k')
+                
+    ax.tick_params(axis='both', which='both', top='off', right='off')    
     plt.tight_layout()
-    plt.savefig('../res/sensitivity_analysis_for_FBA.svg')   
+    plt.savefig('%s/svg/sensitivity_analysis_for_FBA.svg'%R.path)   
