@@ -128,15 +128,15 @@ class RCAT(object):
 
     def get_rmax(self):
 
-        self.rcat.dropna(thresh=self.minimal_conditions, inplace=True)
+        rcat = self.rcat.dropna(thresh=self.minimal_conditions)
 
-        rmax = pd.DataFrame(index=self.rcat.index)
+        rmax = pd.DataFrame(index=rcat.index)
         reactions = map(self.model.reactions.get_by_id, rmax.index)
         subsystems = map(lambda r: r.subsystem, reactions)
         
-        rmax['rmax [s^-1]'] = self.rcat.max(axis=1)
+        rmax['rmax [s^-1]'] = rcat.max(axis=1)
         rmax['subsystem'] = subsystems
-        rmax['condition'] = self.rcat.idxmax(axis=1)
+        rmax['condition'] = rcat.idxmax(axis=1)
         rmax['carbon source'] = map(lambda x: self.gc['carbon source'][x], rmax.condition)
         rmax.to_csv('../cache/rmax_values.csv')
         return rmax
@@ -189,7 +189,7 @@ class RCAT(object):
 
         su_per_as = self.kcat['subunits'] / self.kcat['Catalytic Sites']
 
-        rmaxn = self.rmax
+        rmaxn = self.rmax.copy()
         rmaxn['rmax [s^-1]'] = self.rmax['rmax [s^-1]'][self.kcat.index]*su_per_as
         return rmaxn[rmaxn['rmax [s^-1]']>0]
 
